@@ -67,7 +67,7 @@
       },
       "scripts": {
             "dev": "vite",
-            "build": "npx vite build",
+            "build": "npm exec vite build",
             "preview": "vite preview",
             "start": "vite preview --port $PORT --host"
       }
