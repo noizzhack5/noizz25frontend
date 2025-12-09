@@ -144,6 +144,7 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     statusChangedAt: undefined,
     newAnswersAt: undefined,
     botConversation: undefined, // API doesn't provide this
+    classExplain: knownData.class_explain || undefined,
   };
 }
 

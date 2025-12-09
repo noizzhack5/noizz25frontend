@@ -164,12 +164,18 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
     { value: 100 - matchScore, fill: '#E5E7EB' }
   ];
 
-  // Handle scroll to show/hide compact header
+  // Handle scroll to show/hide compact header with hysteresis to prevent bouncing
   useEffect(() => {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
         const scrollTop = scrollContainerRef.current.scrollTop;
-        setIsScrolled(scrollTop > 150); // Show compact header after scrolling 150px
+        // Use hysteresis: different thresholds for showing vs hiding
+        // This prevents the bounce caused by header height change affecting scroll position
+        if (!isScrolled && scrollTop > 150) {
+          setIsScrolled(true);
+        } else if (isScrolled && scrollTop < 100) {
+          setIsScrolled(false);
+        }
       }
     };
 
@@ -178,7 +184,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
       container.addEventListener('scroll', handleScroll);
       return () => container.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [isScrolled]);
 
   const handleOpenCV = () => {
     if (candidate.cvUrl) {
@@ -478,29 +484,13 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
         {/* Divider */}
         <div className="border-t border-gray-100"></div>
 
-        {/* Job Parameters - Collapsible */}
-        {candidate.status !== 'submitted' && (
-          <CollapsibleSection title="Required Job Parameters" defaultOpen={false}>
-            <div className="space-y-2">
-              {candidate.matchedParameters.map((param, index) => (
-                <div 
-                  key={index}
-                  className={`flex items-center gap-3 p-2 rounded ${
-                    param.matched 
-                      ? 'bg-green-50' 
-                      : 'bg-red-50'
-                  }`}
-                >
-                  {param.matched ? (
-                    <CheckCircle size={16} className="text-green-600 flex-shrink-0" />
-                  ) : (
-                    <XCircle size={16} className="text-red-600 flex-shrink-0" />
-                  )}
-                  <span className={`text-sm ${param.matched ? 'text-green-900' : 'text-red-900'}`}>
-                    {param.name}
-                  </span>
-                </div>
-              ))}
+        {/* Match Score Explanation - Collapsible */}
+        {candidate.status !== 'submitted' && candidate.classExplain && (
+          <CollapsibleSection title="Match Score Explanation" defaultOpen={false}>
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {candidate.classExplain}
+              </p>
             </div>
           </CollapsibleSection>
         )}

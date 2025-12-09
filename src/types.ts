@@ -76,4 +76,7 @@ export interface Candidate {
   
   // Bot conversation
   botConversation?: BotConversation;
+  
+  // Match score explanation from AI classification
+  classExplain?: string;
 }
