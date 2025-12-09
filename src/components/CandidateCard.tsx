@@ -23,6 +23,11 @@ const getJobTypeLabel = (jobType: string) => {
   return labels[jobType] || jobType;
 };
 
+// Generate a consistent random avatar URL based on candidate ID
+const getRandomAvatarUrl = (candidateId: string, size: number = 200) => {
+  return `https://i.pravatar.cc/${size}?u=${candidateId}`;
+};
+
 const getJobTypeParameters = (jobType: string): string[] => {
   const parameters: Record<string, string[]> = {
     headquarters_staff: [
@@ -63,46 +68,26 @@ const getStatusColor = (status: string) => {
   return colors[status] || '#6B7280';
 };
 
-const YesNoField = ({ value, source }: { value?: boolean; source?: 'cv' | 'chatbot' }) => {
+const YesNoField = ({ value }: { value?: boolean }) => {
   if (value === undefined) {
-    return (
-      <span className="inline-flex items-center gap-2">
-        <span className="text-red-500">Missing</span>
-      </span>
-    );
+    return <span className="text-red-500">Missing</span>;
   }
   return (
-    <span className="inline-flex items-center gap-2">
-      <span className={value ? 'text-green-600' : 'text-red-600'}>
-        {value ? 'Yes' : 'No'}
-      </span>
-      {source && (
-        <span className={`text-xs px-2 py-0.5 rounded ${source === 'cv' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
-          {source === 'cv' ? 'CV' : 'Chatbot'}
-        </span>
-      )}
+    <span className={value ? 'text-green-600' : 'text-red-600'}>
+      {value ? 'Yes' : 'No'}
     </span>
   );
 };
 
-const DataField = ({ label, value, source, missing }: { label: string; value?: string | number; source?: 'cv' | 'chatbot'; missing?: boolean }) => {
+const DataField = ({ label, value, missing }: { label: string; value?: string | number; missing?: boolean }) => {
   return (
     <div>
       <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <div className="flex items-center gap-2">
-        {missing ? (
-          <span className="text-red-400 text-sm">Missing</span>
-        ) : (
-          <>
-            <span className="text-gray-900">{value}</span>
-            {source && (
-              <span className={`text-xs px-2 py-0.5 rounded ${source === 'cv' ? 'bg-gray-100 text-gray-600' : 'bg-gray-100 text-gray-600'}`}>
-                {source === 'cv' ? 'CV' : 'Bot'}
-              </span>
-            )}
-          </>
-        )}
-      </div>
+      {missing ? (
+        <span className="text-red-400 text-sm">Missing</span>
+      ) : (
+        <span className="text-gray-900">{value}</span>
+      )}
     </div>
   );
 };
@@ -179,12 +164,18 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
     { value: 100 - matchScore, fill: '#E5E7EB' }
   ];
 
-  // Handle scroll to show/hide compact header
+  // Handle scroll to show/hide compact header with hysteresis to prevent bouncing
   useEffect(() => {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
         const scrollTop = scrollContainerRef.current.scrollTop;
-        setIsScrolled(scrollTop > 150); // Show compact header after scrolling 150px
+        // Use hysteresis: different thresholds for showing vs hiding
+        // This prevents the bounce caused by header height change affecting scroll position
+        if (!isScrolled && scrollTop > 150) {
+          setIsScrolled(true);
+        } else if (isScrolled && scrollTop < 100) {
+          setIsScrolled(false);
+        }
       }
     };
 
@@ -193,7 +184,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
       container.addEventListener('scroll', handleScroll);
       return () => container.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [isScrolled]);
 
   const handleOpenCV = () => {
     if (candidate.cvUrl) {
@@ -231,7 +222,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                   <img 
-                    src={candidate.profileImage || 'https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NDk4Mjc0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'} 
+                    src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 80)} 
                     alt={candidate.fullName} 
                     className="w-full h-full object-cover" 
                   />
@@ -298,7 +289,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
         <div className="flex flex-col items-center space-y-1">
           <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden">
             <img 
-              src={candidate.profileImage || 'https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NDk4Mjc0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'} 
+              src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 200)} 
               alt={candidate.fullName} 
               className="w-full h-full object-cover" 
             />
@@ -493,29 +484,13 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
         {/* Divider */}
         <div className="border-t border-gray-100"></div>
 
-        {/* Job Parameters - Collapsible */}
-        {candidate.status !== 'submitted' && (
-          <CollapsibleSection title="Required Job Parameters" defaultOpen={false}>
-            <div className="space-y-2">
-              {candidate.matchedParameters.map((param, index) => (
-                <div 
-                  key={index}
-                  className={`flex items-center gap-3 p-2 rounded ${
-                    param.matched 
-                      ? 'bg-green-50' 
-                      : 'bg-red-50'
-                  }`}
-                >
-                  {param.matched ? (
-                    <CheckCircle size={16} className="text-green-600 flex-shrink-0" />
-                  ) : (
-                    <XCircle size={16} className="text-red-600 flex-shrink-0" />
-                  )}
-                  <span className={`text-sm ${param.matched ? 'text-green-900' : 'text-red-900'}`}>
-                    {param.name}
-                  </span>
-                </div>
-              ))}
+        {/* Match Score Explanation - Collapsible */}
+        {candidate.status !== 'submitted' && candidate.classExplain && (
+          <CollapsibleSection title="Match Score Explanation" defaultOpen={false}>
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {candidate.classExplain}
+              </p>
             </div>
           </CollapsibleSection>
         )}
@@ -528,10 +503,10 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <h4 className="text-xs text-gray-500 mb-3">Personal Information</h4>
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 md:gap-x-4 sm:gap-x-[30px] gap-y-3">
-                  <DataField label="Full Name" value={candidate.fullName} source="cv" />
-                  <DataField label="Full Name (Hebrew)" value={candidate.fullNameHebrew} source="cv" missing={!candidate.fullNameHebrew} />
-                  <DataField label="Age" value={candidate.age} source="cv" missing={!candidate.age} />
-                  <DataField label="Citizenship" value={candidate.citizenship} source="cv" missing={!candidate.citizenship} />
+                  <DataField label="Full Name" value={candidate.fullName} />
+                  <DataField label="Full Name (Hebrew)" value={candidate.fullNameHebrew} missing={!candidate.fullNameHebrew} />
+                  <DataField label="Age" value={candidate.age} missing={!candidate.age} />
+                  <DataField label="Citizenship" value={candidate.citizenship} missing={!candidate.citizenship} />
                 </div>
               </div>
             </div>
@@ -542,19 +517,19 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <div className="space-y-2">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Can travel in/to Europe</p>
-                  <YesNoField value={candidate.canTravelEurope} source="chatbot" />
+                  <YesNoField value={candidate.canTravelEurope} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Can travel to Israel</p>
-                  <YesNoField value={candidate.canTravelIsrael} source="chatbot" />
+                  <YesNoField value={candidate.canTravelIsrael} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Do they live actually in Europe</p>
-                  <YesNoField value={candidate.livesInEurope} source="chatbot" />
+                  <YesNoField value={candidate.livesInEurope} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Are they native Israeli</p>
-                  <YesNoField value={candidate.nativeIsraeli} source="chatbot" />
+                  <YesNoField value={candidate.nativeIsraeli} />
                 </div>
               </div>
             </div>
@@ -565,11 +540,11 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <div className="space-y-2">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Does the candidate speak good English</p>
-                  <YesNoField value={candidate.speaksEnglish} source="chatbot" />
+                  <YesNoField value={candidate.speaksEnglish} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Do they remember the position they applied for</p>
-                  <YesNoField value={candidate.remembersPosition} source="chatbot" />
+                  <YesNoField value={candidate.remembersPosition} />
                 </div>
               </div>
             </div>

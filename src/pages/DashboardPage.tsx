@@ -161,26 +161,26 @@ export function DashboardPage() {
         };
 
         return (
-          candidate.fullName.toLowerCase().includes(query) ||
+          candidate.fullName?.toLowerCase().includes(query) ||
           candidate.fullNameHebrew?.toLowerCase().includes(query) ||
-          candidate.email.toLowerCase().includes(query) ||
-          candidate.phone.includes(query) ||
-          candidate.campaignSource.toLowerCase().includes(query) ||
+          candidate.email?.toLowerCase().includes(query) ||
+          candidate.phone?.includes(query) ||
+          candidate.campaignSource?.toLowerCase().includes(query) ||
           candidate.citizenship?.toLowerCase().includes(query) ||
           candidate.age?.toString().includes(query) ||
-          candidate.jobType.toLowerCase().includes(query) ||
-          getJobTypeLabel(candidate.jobType).toLowerCase().includes(query) ||
-          candidate.status.toLowerCase().includes(query) ||
-          getStatusLabel(candidate.status).toLowerCase().includes(query) ||
-          candidate.primaryGroup.groupName.toLowerCase().includes(query) ||
-          (candidate.primaryGroup.matchScore !== null && candidate.primaryGroup.matchScore.toString().includes(query)) ||
+          candidate.jobType?.toLowerCase().includes(query) ||
+          (candidate.jobType && getJobTypeLabel(candidate.jobType).toLowerCase().includes(query)) ||
+          candidate.status?.toLowerCase().includes(query) ||
+          (candidate.status && getStatusLabel(candidate.status).toLowerCase().includes(query)) ||
+          candidate.primaryGroup?.groupName?.toLowerCase().includes(query) ||
+          (candidate.primaryGroup?.matchScore !== null && candidate.primaryGroup?.matchScore?.toString().includes(query)) ||
           candidate.alternativeGroups?.some(
             (group) =>
-              group.groupName.toLowerCase().includes(query) ||
-              group.matchScore.toString().includes(query)
+              group.groupName?.toLowerCase().includes(query) ||
+              group.matchScore?.toString().includes(query)
           ) ||
           candidate.matchedParameters?.some((param) =>
-            param.name.toLowerCase().includes(query)
+            param.name?.toLowerCase().includes(query)
           ) ||
           candidate.aiSkillsSummary?.toLowerCase().includes(query) ||
           candidate.notes?.toLowerCase().includes(query) ||
@@ -319,12 +319,6 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* Loading Indicator */}
-      {isLoading && (
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-blue-600">Loading candidates...</p>
-        </div>
-      )}
       {/* Action Board */}
       <ActionBoard
         isVisible={actionBoardVisible}
