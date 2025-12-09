@@ -84,7 +84,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
   const readyForBotCount = activeCandidates.filter(c => c.status === 'ready_for_bot_interview').length;
   const botInterviewCount = activeCandidates.filter(c => c.status === 'bot_interview').length;
   const readyCount = activeCandidates.filter(c => c.status === 'ready_for_recruit').length;
-  const highMatchCount = activeCandidates.filter(c => c.primaryGroup.matchScore >= 80).length;
+  const highMatchCount = activeCandidates.filter(c => c.primaryGroup.matchScore !== null && c.primaryGroup.matchScore >= 80).length;
 
   // Calculate top 3 countries for Ready for Recruit candidates
   const readyCandidates = activeCandidates.filter(c => c.status === 'ready_for_recruit');
@@ -257,7 +257,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                     title="Filter by Ready for Recruit"
                   >
                     <div className="w-2 h-2 rounded-full bg-[#10B981]"></div>
-                    <span className="text-xs text-gray-600">{readyCount} Ready</span>
+                    <span className="text-xs text-gray-600">{readyCount} Ready For Recruit</span>
                   </button>
                 </div>
               </div>
@@ -315,10 +315,10 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                   <ResponsiveContainer width={120} height={60}>
                     <BarChart
                       data={[
-                        { name: '90+', value: activeCandidates.filter(c => c.primaryGroup.matchScore >= 90).length, range: '90-100' },
-                        { name: '80-89', value: activeCandidates.filter(c => c.primaryGroup.matchScore >= 80 && c.primaryGroup.matchScore < 90).length, range: '80-89' },
-                        { name: '70-79', value: activeCandidates.filter(c => c.primaryGroup.matchScore >= 70 && c.primaryGroup.matchScore < 80).length, range: '70-79' },
-                        { name: '0-70', value: activeCandidates.filter(c => c.primaryGroup.matchScore < 70).length, range: '0-69' },
+                        { name: '90+', value: activeCandidates.filter(c => c.primaryGroup.matchScore !== null && c.primaryGroup.matchScore >= 90).length, range: '90-100' },
+                        { name: '80-89', value: activeCandidates.filter(c => c.primaryGroup.matchScore !== null && c.primaryGroup.matchScore >= 80 && c.primaryGroup.matchScore < 90).length, range: '80-89' },
+                        { name: '70-79', value: activeCandidates.filter(c => c.primaryGroup.matchScore !== null && c.primaryGroup.matchScore >= 70 && c.primaryGroup.matchScore < 80).length, range: '70-79' },
+                        { name: '0-70', value: activeCandidates.filter(c => c.primaryGroup.matchScore !== null && c.primaryGroup.matchScore < 70).length, range: '0-69' },
                       ]}
                       margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                       onClick={(data) => {

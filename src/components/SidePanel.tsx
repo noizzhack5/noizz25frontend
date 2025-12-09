@@ -174,13 +174,19 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
             <div className="bg-gray-50 p-4 border border-gray-200 mb-4">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-black">{candidate.primaryGroup.groupName}</p>
-                <p className="text-black">{candidate.primaryGroup.matchScore}%</p>
+                {candidate.primaryGroup.matchScore !== null ? (
+                  <p className="text-black">{candidate.primaryGroup.matchScore}%</p>
+                ) : (
+                  <p className="text-gray-400">-</p>
+                )}
               </div>
               <div className="w-full bg-gray-200 h-2 overflow-hidden">
-                <div
-                  className="bg-black h-full transition-all"
-                  style={{ width: `${candidate.primaryGroup.matchScore}%` }}
-                />
+                {candidate.primaryGroup.matchScore !== null && (
+                  <div
+                    className="bg-black h-full transition-all"
+                    style={{ width: `${candidate.primaryGroup.matchScore}%` }}
+                  />
+                )}
               </div>
             </div>
 

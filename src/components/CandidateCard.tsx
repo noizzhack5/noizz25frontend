@@ -10,6 +10,7 @@ interface CandidateCardProps {
   candidate: Candidate;
   onClose: () => void;
   onStatusChange: (candidateId: string, newStatus: 'submitted' | 'bot_interview' | 'ready_for_recruit') => void;
+  onRefresh?: () => void; // Optional callback to refresh the candidates list
 }
 
 const getJobTypeLabel = (jobType: string) => {
@@ -156,7 +157,7 @@ const CollapsibleSection = ({
   );
 };
 
-export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateCardProps) {
+export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }: CandidateCardProps) {
   const [recruiterNotes, setRecruiterNotes] = useState(candidate.manualNotes || '');
   const [isScrolled, setIsScrolled] = useState(false);
   const [showCVModal, setShowCVModal] = useState(false);
@@ -172,9 +173,10 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
   const statusColor = getStatusColor(candidate.status);
   
   // Calculate match percentage for pie chart
+  const matchScore = candidate.primaryGroup.matchScore ?? 0;
   const matchData = [
-    { value: candidate.primaryGroup.matchScore, fill: '#000000' },
-    { value: 100 - candidate.primaryGroup.matchScore, fill: '#E5E7EB' }
+    { value: matchScore, fill: '#000000' },
+    { value: 100 - matchScore, fill: '#E5E7EB' }
   ];
 
   // Handle scroll to show/hide compact header
@@ -404,9 +406,9 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
                               <Cell 
                                 key={`cell-${index}`} 
                                 fill={index === 0 ? (
-                                  candidate.primaryGroup.matchScore >= 90 ? '#10B981' :
-                                  candidate.primaryGroup.matchScore >= 80 ? '#F3CB06' :
-                                  candidate.primaryGroup.matchScore >= 70 ? '#F59E0B' :
+                                  matchScore >= 90 ? '#10B981' :
+                                  matchScore >= 80 ? '#F3CB06' :
+                                  matchScore >= 70 ? '#F59E0B' :
                                   '#EF4444'
                                 ) : '#E5E7EB'} 
                               />
@@ -419,13 +421,13 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
                           className="text-base"
                           style={{
                             color: 
-                              candidate.primaryGroup.matchScore >= 90 ? '#10B981' :
-                              candidate.primaryGroup.matchScore >= 80 ? '#F3CB06' :
-                              candidate.primaryGroup.matchScore >= 70 ? '#F59E0B' :
+                              matchScore >= 90 ? '#10B981' :
+                              matchScore >= 80 ? '#F3CB06' :
+                              matchScore >= 70 ? '#F59E0B' :
                               '#EF4444'
                           }}
                         >
-                          {candidate.primaryGroup.matchScore}%
+                          {matchScore}%
                         </span>
                       </div>
                     </div>
@@ -435,16 +437,16 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
                         className="text-sm"
                         style={{
                           color: 
-                            candidate.primaryGroup.matchScore >= 90 ? '#10B981' :
-                            candidate.primaryGroup.matchScore >= 80 ? '#F3CB06' :
-                            candidate.primaryGroup.matchScore >= 70 ? '#F59E0B' :
+                            matchScore >= 90 ? '#10B981' :
+                            matchScore >= 80 ? '#F3CB06' :
+                            matchScore >= 70 ? '#F59E0B' :
                             '#EF4444'
                         }}
                       >
-                        {candidate.primaryGroup.matchScore >= 90 && 'Excellent'}
-                        {candidate.primaryGroup.matchScore >= 80 && candidate.primaryGroup.matchScore < 90 && 'Good'}
-                        {candidate.primaryGroup.matchScore >= 70 && candidate.primaryGroup.matchScore < 80 && 'Moderate'}
-                        {candidate.primaryGroup.matchScore < 70 && 'Low'}
+                        {matchScore >= 90 && 'Excellent'}
+                        {matchScore >= 80 && matchScore < 90 && 'Good'}
+                        {matchScore >= 70 && matchScore < 80 && 'Moderate'}
+                        {matchScore < 70 && 'Low'}
                       </p>
                     </div>
                   </div>
@@ -698,10 +700,13 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
                   setIsStartingBot(true);
                   setBotError(null);
                   try {
-                    // Call the API to trigger bot processor
-                    await apiClient.triggerBotProcessor();
-                    // Update candidate status to 'bot_interview'
-                    onStatusChange(candidate.id, 'bot_interview');
+                    // Call the API to trigger bot processor with candidate ID
+                    // The server will handle status updates - client should not update status
+                    await apiClient.triggerBotProcessor(candidate.id);
+                    // Refresh candidates list to get updated status from server
+                    if (onRefresh) {
+                      onRefresh();
+                    }
                     setConversationStarted(true);
                     setShowBotConfirmation(false);
                   } catch (error) {

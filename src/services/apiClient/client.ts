@@ -197,10 +197,11 @@ class ApiClient {
   }
 
   /**
-   * Trigger bot processor manually
+   * Trigger bot processor manually for a specific candidate
+   * @param candidateId - The ID of the candidate to process
    */
-  async triggerBotProcessor(): Promise<{ message?: string }> {
-    return this.request<{ message?: string }>("/process-waiting-for-bot", {
+  async triggerBotProcessor(candidateId: string): Promise<{ message?: string }> {
+    return this.request<{ message?: string }>(`/process-bot/${candidateId}`, {
       method: "POST",
     });
   }
