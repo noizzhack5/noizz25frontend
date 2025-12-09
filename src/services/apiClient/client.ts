@@ -6,10 +6,13 @@ import type {
   CVDocument,
   CVSearchParams,
   HTTPValidationError,
+  ChatHistoryResponse,
 } from "./types";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://noizz25backend.onrender.com";
+
+const CHAT_HISTORY_BASE_URL = "https://noizzhrdashboard.onrender.com";
 
 class ApiError extends Error {
   constructor(
@@ -216,6 +219,61 @@ class ApiClient {
         method: "POST",
       }
     );
+  }
+
+  /**
+   * Get chat history for a candidate
+   * @param candidateId - The ID of the candidate
+   */
+  async getChatHistory(candidateId: string): Promise<ChatHistoryResponse> {
+    const chatHistoryBaseUrl = CHAT_HISTORY_BASE_URL.replace(/\/$/, "");
+    const url = `${chatHistoryBaseUrl}/chat-history/${candidateId}`;
+    
+    // Use a separate request for chat-history with different base URL
+    const isFormData = false;
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        let errorData: HTTPValidationError | null = null;
+        try {
+          errorData = await response.json();
+        } catch {
+          // If response is not JSON, use status text
+        }
+
+        throw new ApiError(
+          errorData?.detail?.[0]?.msg || response.statusText,
+          response.status,
+          errorData
+        );
+      }
+
+      // Handle empty responses
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const text = await response.text();
+        return text ? JSON.parse(text) : ({} as ChatHistoryResponse);
+      }
+
+      return {} as ChatHistoryResponse;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(
+        error instanceof Error ? error.message : "Network error",
+        0,
+        error
+      );
+    }
   }
 }
 

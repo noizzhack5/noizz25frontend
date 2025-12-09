@@ -133,3 +133,18 @@ export const StatusIdLabels: Record<StatusId, string> = {
   [StatusId.ReadyForRecruit]: "Ready For Recruit",
 };
 
+// Chat History types
+export interface ChatMessage {
+  sender: 'bot' | 'user' | 'You' | 'candidate';
+  message?: string; // API uses "message"
+  text?: string; // Fallback for local data
+  timestamp: string;
+}
+
+export interface ChatHistoryResponse {
+  chat_history?: ChatMessage[]; // API response format
+  messages?: ChatMessage[]; // Fallback format
+  started_at?: string;
+  completed_at?: string;
+}
+

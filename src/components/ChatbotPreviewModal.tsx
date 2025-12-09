@@ -1,6 +1,8 @@
-import { X, Bot, User, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Bot, User, ThumbsUp, ThumbsDown, Loader2 } from 'lucide-react';
 import type { Candidate } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { apiClient } from '@/services/apiClient/client';
+import type { ChatMessage } from '@/services/apiClient/types';
 
 interface ChatbotPreviewModalProps {
   candidate: Candidate;
@@ -8,9 +10,53 @@ interface ChatbotPreviewModalProps {
 }
 
 export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalProps) {
-  // Extract conversation data from candidate's bot conversation
-  const messages = candidate.botConversation?.messages || [];
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [startedAt, setStartedAt] = useState<string | null>(null);
+  const [completedAt, setCompletedAt] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<'good' | 'bad' | null>(null);
+
+  // Load chat history from API
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await apiClient.getChatHistory(candidate.id);
+        // API returns chat_history array, normalize to messages
+        const apiMessages = response.chat_history || response.messages || [];
+        // Normalize sender values: "You" -> "bot", "candidate" -> "user"
+        // And normalize message/text fields
+        const normalizedMessages: ChatMessage[] = apiMessages.map(msg => ({
+          sender: msg.sender === 'You' ? 'bot' : msg.sender === 'candidate' ? 'user' : msg.sender,
+          text: msg.message || msg.text || '',
+          timestamp: msg.timestamp,
+        }));
+        setMessages(normalizedMessages);
+        setStartedAt(response.started_at || null);
+        setCompletedAt(response.completed_at || null);
+      } catch (err) {
+        console.error('Failed to load chat history:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load chat history');
+        // Fallback to candidate's bot conversation if available
+        if (candidate.botConversation?.messages) {
+          const fallbackMessages: ChatMessage[] = candidate.botConversation.messages.map(msg => ({
+            sender: msg.sender,
+            text: msg.text,
+            timestamp: msg.timestamp.toISOString(),
+          }));
+          setMessages(fallbackMessages);
+          setStartedAt(candidate.botConversation.startedAt.toISOString());
+          setCompletedAt(candidate.botConversation.completedAt?.toISOString() || null);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadChatHistory();
+  }, [candidate.id, candidate.botConversation]);
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -40,7 +86,18 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto p-4 bg-[#E5DDD5] space-y-3">
-          {messages.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center text-gray-500 py-8">
+              <Loader2 size={48} className="mx-auto mb-2 text-gray-400 animate-spin" />
+              <p>Loading conversation...</p>
+            </div>
+          ) : error && messages.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">
+              <Bot size={48} className="mx-auto mb-2 text-gray-400" />
+              <p className="text-red-600 mb-2">Error: {error}</p>
+              <p className="text-sm">No conversation available</p>
+            </div>
+          ) : messages.length === 0 ? (
             <div className="text-center text-gray-500 py-8">
               <Bot size={48} className="mx-auto mb-2 text-gray-400" />
               <p>No conversation available</p>
@@ -90,9 +147,12 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
         <div className="rounded-b-lg border-t border-gray-200">
           <div className="px-4 py-3 flex items-center gap-2 text-gray-500 text-sm border-b border-gray-200 bg-[#F0F0F0]">
             <Bot size={16} />
-            <span>Conversation completed on {candidate.botConversation?.completedAt 
-              ? new Date(candidate.botConversation.completedAt).toLocaleDateString()
-              : 'N/A'}
+            <span>
+              {completedAt 
+                ? `Conversation completed on ${new Date(completedAt).toLocaleDateString()}`
+                : startedAt
+                ? `Conversation started on ${new Date(startedAt).toLocaleDateString()}`
+                : 'Conversation status: N/A'}
             </span>
           </div>
           
