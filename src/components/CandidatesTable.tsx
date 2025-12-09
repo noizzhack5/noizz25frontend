@@ -350,9 +350,9 @@ export function CandidatesTable({
                           onClick={(e) => {
                             e.stopPropagation();
                             if (onViewResume) {
-                              onViewResume(candidate.cvUrl, candidate.fullName);
+                              onViewResume(candidate.cvUrl!, candidate.fullName);
                             } else {
-                              window.open(candidate.cvUrl, '_blank');
+                              window.open(candidate.cvUrl!, '_blank');
                             }
                           }}
                           className="p-2 hover:bg-gray-200 transition-colors rounded group relative"
