@@ -6,7 +6,7 @@ interface ActionBoardProps {
   isVisible: boolean;
   onToggle: () => void;
   candidates: Candidate[];
-  onStatusFilterClick?: (status: 'submitted' | 'bot_interview' | 'ready_for_recruit') => void;
+  onStatusFilterClick?: (status: 'submitted' | 'bot_interview' | 'ready_for_bot_interview' | 'ready_for_recruit' | 'all') => void;
   onCountryFilterClick?: (country: string) => void;
   onMatchRangeFilterClick?: (range: string) => void;
   statusFilter?: string;
@@ -212,9 +212,9 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                   <button 
                     onClick={() => {
                       if (statusFilter === 'ready_for_bot_interview') {
-                        onStatusFilterClick?.('all' as any);
+                        onStatusFilterClick?.('all');
                       } else {
-                        onStatusFilterClick?.('ready_for_bot_interview' as any);
+                        onStatusFilterClick?.('ready_for_bot_interview');
                       }
                     }}
                     className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer ${

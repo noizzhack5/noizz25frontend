@@ -520,7 +520,7 @@ export const mockCandidates: Candidate[] = [
     age: 28,
     citizenship: 'Israeli',
     campaignSource: 'Facebook Tech Jobs',
-    status: 'waiting_for_bot_interview',
+    status: 'submitted',
     jobType: 'headquarters_staff',
     canTravelEurope: true,
     canTravelIsrael: true,
@@ -531,7 +531,7 @@ export const mockCandidates: Candidate[] = [
     profileImage: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHdvbWFuJTIwcG9ydHJhaXR8ZW58MXx8fHwxNzY1MDkxNjAzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     statusHistory: [
       { status: 'submitted', timestamp: new Date('2024-11-26'), note: 'New application' },
-      { status: 'waiting_for_bot_interview', timestamp: new Date('2024-11-26'), note: 'Awaiting bot interview' }
+      { status: 'submitted', timestamp: new Date('2024-11-26'), note: 'Awaiting bot interview' }
     ],
     primaryGroup: {
       groupName: 'Headquarters Staff',
@@ -931,7 +931,7 @@ export const mockCandidates: Candidate[] = [
     age: 42,
     citizenship: 'Belgian',
     campaignSource: 'LinkedIn Campaign Q4',
-    status: 'waiting_for_bot_interview',
+    status: 'submitted',
     jobType: 'training_instruction',
     canTravelEurope: true,
     canTravelIsrael: false,
@@ -942,7 +942,7 @@ export const mockCandidates: Candidate[] = [
     profileImage: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHdvbWFufGVufDF8fHx8MTc2NTA5MTYwM3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     statusHistory: [
       { status: 'submitted', timestamp: new Date('2024-11-26'), note: 'Application received' },
-      { status: 'waiting_for_bot_interview', timestamp: new Date('2024-11-26'), note: 'Awaiting interview scheduling' }
+      { status: 'submitted', timestamp: new Date('2024-11-26'), note: 'Awaiting interview scheduling' }
     ],
     primaryGroup: {
       groupName: 'Training/Instruction',
@@ -1363,7 +1363,7 @@ export const mockCandidates: Candidate[] = [
     age: 40,
     citizenship: 'Spanish',
     campaignSource: 'X (Twitter) Tech Hiring',
-    status: 'waiting_for_bot_interview',
+    status: 'submitted',
     jobType: 'training_instruction',
     canTravelEurope: true,
     canTravelIsrael: false,
@@ -1374,7 +1374,7 @@ export const mockCandidates: Candidate[] = [
     profileImage: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYW4lMjBwcm9mZXNzaW9uYWwlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NjUwNDE2Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
     statusHistory: [
       { status: 'submitted', timestamp: new Date('2024-11-26'), note: 'Application received' },
-      { status: 'waiting_for_bot_interview', timestamp: new Date('2024-11-27'), note: 'Awaiting interview' }
+      { status: 'submitted', timestamp: new Date('2024-11-27'), note: 'Awaiting interview' }
     ],
     primaryGroup: {
       groupName: 'Training/Instruction',

@@ -34,10 +34,15 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      ...options.headers,
-    };
+    
+    // Don't set Content-Type for FormData - let browser set it with boundary
+    const isFormData = options.body instanceof FormData;
+    const headers: HeadersInit = isFormData
+      ? { ...options.headers }
+      : {
+          "Content-Type": "application/json",
+          ...options.headers,
+        };
 
     try {
       const response = await fetch(url, {
@@ -174,14 +179,20 @@ class ApiClient {
 
   /**
    * Update CV status
+   * Accepts either statusId (number) or status (string)
    */
   async updateCVStatus(
     id: string,
-    statusId: number
+    statusIdOrStatus: number | string
   ): Promise<CVDocument> {
+    const body: import("./types").StatusUpdateRequest = 
+      typeof statusIdOrStatus === "number"
+        ? { status_id: statusIdOrStatus }
+        : { status: statusIdOrStatus };
+    
     return this.request<CVDocument>(`/cv/${id}/status`, {
       method: "PATCH",
-      body: JSON.stringify({ status_id: statusId }),
+      body: JSON.stringify(body),
     });
   }
 

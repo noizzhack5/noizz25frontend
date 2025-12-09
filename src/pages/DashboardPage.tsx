@@ -33,6 +33,7 @@ export function DashboardPage() {
     setMatchFilter,
     setCampaignFilter,
     setCountriesFilter,
+    addCandidate,
     deleteCandidate,
     updateCandidate,
     updateCandidateStatus,
@@ -269,11 +270,16 @@ export function DashboardPage() {
     }
   };
 
-  const handleAddCandidate = async (newCandidate: Omit<Candidate, "id">) => {
+  const handleAddCandidate = async (newCandidate: Omit<Candidate, "id">, file?: File) => {
     try {
-      await updateCandidate("", newCandidate as Partial<Candidate>);
+      await addCandidate(newCandidate, file);
       setShowAddCandidateModal(false);
-      setToast({ message: "Please use the upload CV form to add candidates", type: "info" });
+      setToast({ 
+        message: file 
+          ? "Candidate added successfully! CV is being processed." 
+          : "Candidate added successfully!", 
+        type: "success" 
+      });
       // Refresh the list
       fetchCandidates();
     } catch (error) {
@@ -284,8 +290,8 @@ export function DashboardPage() {
     }
   };
 
-  const handleStatusFilterClick = (status: Status) => {
-    setStatusFilter(status);
+  const handleStatusFilterClick = (status: Status | 'all') => {
+    setStatusFilter(status === 'all' ? 'all' : status);
   };
 
   const handleCountryFilterClick = (country: string) => {

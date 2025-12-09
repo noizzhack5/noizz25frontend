@@ -1,13 +1,14 @@
 import { X, Upload } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Candidate } from '@/types';
 
 interface AddCandidateModalProps {
   onClose: () => void;
-  onAdd: (candidate: Omit<Candidate, 'id'>) => void;
+  onAdd: (candidate: Omit<Candidate, 'id'>, file?: File) => void | Promise<void>;
 }
 
 export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -17,6 +18,8 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
     status: 'submitted' as const,
     notes: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Add escape key listener
   useEffect(() => {
@@ -30,11 +33,12 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     
     const newCandidate: Omit<Candidate, 'id'> = {
       ...formData,
+      cvUrl: selectedFile ? URL.createObjectURL(selectedFile) : '',
       statusHistory: [
         {
           status: formData.status,
@@ -53,7 +57,13 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
       createdAt: new Date()
     };
 
-    onAdd(newCandidate);
+    try {
+      await onAdd(newCandidate, selectedFile || undefined);
+      onClose();
+    } catch (error) {
+      // Error handling is done in the parent component
+      console.error('Error adding candidate:', error);
+    }
   };
 
   const handleChange = (
@@ -65,6 +75,59 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
     });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+      // Validate file type
+      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a PDF, DOC, or DOCX file');
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      // Validate file size (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+      // Validate file type
+      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please upload a PDF, DOC, or DOCX file');
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
   return (
     <>
       {/* Modal */}
@@ -73,11 +136,11 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
         onClick={onClose}
       >
         <div 
-          className="bg-white w-full max-w-2xl shadow-2xl rounded-xl pointer-events-auto"
+          className="bg-white w-full max-w-2xl max-h-[90vh] shadow-2xl rounded-xl pointer-events-auto flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between rounded-t-xl">
+          <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-5 flex items-center justify-between rounded-t-xl z-10 flex-shrink-0">
             <h2 className="text-black">Add New Candidate</h2>
             <button
               onClick={onClose}
@@ -87,8 +150,8 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
             </button>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="px-8 py-4 space-y-4">
+          {/* Form - Scrollable */}
+          <form onSubmit={handleSubmit} className="px-8 py-4 space-y-4 overflow-y-auto flex-1">
             {/* Personal Information */}
             <div>
               <h3 className="text-black mb-3">Personal Information</h3>
@@ -170,18 +233,45 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
             {/* CV Upload */}
             <div>
               <h3 className="text-black mb-3">CV Upload</h3>
-              <div className="border-2 border-dashed border-gray-300 rounded p-5 text-center hover:border-black transition-colors cursor-pointer">
+              <div 
+                onClick={handleUploadClick}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded p-5 text-center transition-colors cursor-pointer ${
+                  isDragging 
+                    ? 'border-black bg-gray-50' 
+                    : selectedFile 
+                    ? 'border-green-500 bg-green-50' 
+                    : 'border-gray-300 hover:border-black'
+                }`}
+              >
                 <Upload className="mx-auto mb-2 text-gray-400" size={28} />
-                <p className="text-sm text-gray-600 mb-1">
-                  Click to upload or drag and drop
-                </p>
-                <p className="text-xs text-gray-500">
-                  PDF, DOC, DOCX (max. 10MB)
-                </p>
+                {selectedFile ? (
+                  <>
+                    <p className="text-sm text-green-600 mb-1 font-medium">
+                      {selectedFile.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Click to change file
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-600 mb-1">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PDF, DOC, DOCX (max. 10MB)
+                    </p>
+                  </>
+                )}
                 <input
+                  ref={fileInputRef}
                   type="file"
                   className="hidden"
                   accept=".pdf,.doc,.docx"
+                  onChange={handleFileChange}
                 />
               </div>
             </div>
@@ -197,24 +287,25 @@ export function AddCandidateModal({ onClose, onAdd }: AddCandidateModalProps) {
                 placeholder="Add any initial notes or observations..."
               />
             </div>
-
-            {/* Actions */}
-            <div className="flex gap-3 pt-3 border-t border-gray-200">
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-black text-white hover:bg-gray-800 transition-colors rounded text-sm"
-              >
-                Add Candidate
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2.5 border border-gray-300 hover:border-black transition-colors rounded text-sm"
-              >
-                Cancel
-              </button>
-            </div>
           </form>
+
+          {/* Actions - Fixed at bottom */}
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 px-8 py-4 flex gap-3 flex-shrink-0">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="px-6 py-2.5 bg-black text-white hover:bg-gray-800 transition-colors rounded text-sm"
+            >
+              Add Candidate
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2.5 border border-gray-300 hover:border-black transition-colors rounded text-sm"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     </>
