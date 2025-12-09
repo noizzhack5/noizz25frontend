@@ -1,4 +1,4 @@
-import { FileSearch, Trash2, TrendingUp, MessageCircle, ArrowUpDown, ArrowUp, ArrowDown, FileText, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash2, ArrowUpDown, ArrowUp, ArrowDown, FileText, Eye } from 'lucide-react';
 import { StatusBadge } from './StatusBadge';
 import type { Candidate } from '@/types';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ interface CandidatesTableProps {
   selectedCandidateId?: string;
   showDeleted?: boolean;
   isSimplified?: boolean;
+  hideHeader?: boolean;
 }
 
 const getJobTypeLabel = (jobType: string | null | undefined): string | null => {
@@ -51,14 +52,13 @@ export function CandidatesTable({
   onViewResume,
   selectedCandidateId,
   showDeleted = false,
-  isSimplified = false
+  isSimplified = false,
+  hideHeader = false
 }: CandidatesTableProps) {
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
   const [hoveredColumn, setHoveredColumn] = useState<SortField>(null);
   const [sortField, setSortField] = useState<SortField>('matchScore');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -186,71 +186,72 @@ export function CandidatesTable({
 
   // Full view - all columns
   return (
-    <div className="border border-gray-200 overflow-hidden rounded-lg">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('name')}
-                onMouseEnter={() => setHoveredColumn('name')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Full Name</span>
-                  {getSortIcon('name')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('status')}
-                onMouseEnter={() => setHoveredColumn('status')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Status</span>
-                  {getSortIcon('status')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('jobType')}
-                onMouseEnter={() => setHoveredColumn('jobType')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Job Type</span>
-                  {getSortIcon('jobType')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('matchScore')}
-                onMouseEnter={() => setHoveredColumn('matchScore')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Match Score</span>
-                  {getSortIcon('matchScore')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('campaign')}
-                onMouseEnter={() => setHoveredColumn('campaign')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Campaign</span>
-                  {getSortIcon('campaign')}
-                </div>
-              </th>
-              <th className="px-6 py-4 text-left text-sm text-gray-600">CV</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCandidates.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((candidate) => {
+    <div className={`border border-gray-200 ${hideHeader ? 'border-t-0 rounded-b-lg' : 'rounded-lg'}`}>
+      <table className="w-full border-collapse">
+        {!hideHeader && (
+          <thead className="bg-gray-50">
+              <tr>
+                <th 
+                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
+                  onClick={() => handleSort('name')}
+                  onMouseEnter={() => setHoveredColumn('name')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Full Name</span>
+                    {getSortIcon('name')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
+                  onClick={() => handleSort('status')}
+                  onMouseEnter={() => setHoveredColumn('status')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Status</span>
+                    {getSortIcon('status')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
+                  onClick={() => handleSort('jobType')}
+                  onMouseEnter={() => setHoveredColumn('jobType')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Job Type</span>
+                    {getSortIcon('jobType')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
+                  onClick={() => handleSort('matchScore')}
+                  onMouseEnter={() => setHoveredColumn('matchScore')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Match Score</span>
+                    {getSortIcon('matchScore')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
+                  onClick={() => handleSort('campaign')}
+                  onMouseEnter={() => setHoveredColumn('campaign')}
+                  onMouseLeave={() => setHoveredColumn(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>Campaign</span>
+                    {getSortIcon('campaign')}
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 bg-gray-50 border-b border-gray-200">CV</th>
+              </tr>
+            </thead>
+        )}
+        <tbody>
+            {sortedCandidates.map((candidate) => {
               const isNew = isRecentlyAdded(candidate);
               const hasStatusChange = hasRecentStatusChange(candidate);
               const hasNewAnswers = hasRecentNewAnswers(candidate);
@@ -349,9 +350,9 @@ export function CandidatesTable({
                           onClick={(e) => {
                             e.stopPropagation();
                             if (onViewResume) {
-                              onViewResume(candidate.cvUrl, candidate.fullName);
+                              onViewResume(candidate.cvUrl!, candidate.fullName);
                             } else {
-                              window.open(candidate.cvUrl, '_blank');
+                              window.open(candidate.cvUrl!, '_blank');
                             }
                           }}
                           className="p-2 hover:bg-gray-200 transition-colors rounded group relative"
@@ -384,7 +385,6 @@ export function CandidatesTable({
             })}
           </tbody>
         </table>
-      </div>
     </div>
   );
 }
