@@ -108,11 +108,8 @@ export function CandidatesTable({
   }
 
   // Sort candidates based on selected field and direction
-  const sortedCandidates = [...candidates].sort((a, b) => {
-    // Always put newly added candidates first (isNew flag)
-    if (a.isNew && !b.isNew) return -1;
-    if (!a.isNew && b.isNew) return 1;
-
+  // When hideHeader is true, parent handles sorting, so use candidates as-is
+  const sortedCandidates = hideHeader ? candidates : [...candidates].sort((a, b) => {
     if (!sortField || !sortDirection) {
       // Default sort by match score descending (null values go to end)
       const scoreA = a.primaryGroup.matchScore ?? -1;
@@ -189,66 +186,66 @@ export function CandidatesTable({
     <div className={`border border-gray-200 ${hideHeader ? 'border-t-0 rounded-b-lg' : 'rounded-lg'}`}>
       <table className="w-full border-collapse">
         {!hideHeader && (
-          <thead className="bg-gray-50">
-              <tr>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
-                  onClick={() => handleSort('name')}
-                  onMouseEnter={() => setHoveredColumn('name')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Full Name</span>
-                    {getSortIcon('name')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
-                  onClick={() => handleSort('status')}
-                  onMouseEnter={() => setHoveredColumn('status')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Status</span>
-                    {getSortIcon('status')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
-                  onClick={() => handleSort('jobType')}
-                  onMouseEnter={() => setHoveredColumn('jobType')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Job Type</span>
-                    {getSortIcon('jobType')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
-                  onClick={() => handleSort('matchScore')}
-                  onMouseEnter={() => setHoveredColumn('matchScore')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Match Score</span>
-                    {getSortIcon('matchScore')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none bg-gray-50 border-b border-gray-200"
-                  onClick={() => handleSort('campaign')}
-                  onMouseEnter={() => setHoveredColumn('campaign')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Campaign</span>
-                    {getSortIcon('campaign')}
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 bg-gray-50 border-b border-gray-200">CV</th>
-              </tr>
-            </thead>
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th 
+                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                onClick={() => handleSort('name')}
+                onMouseEnter={() => setHoveredColumn('name')}
+                onMouseLeave={() => setHoveredColumn(null)}
+              >
+                <div className="flex items-center gap-2">
+                  <span>Full Name</span>
+                  {getSortIcon('name')}
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                onClick={() => handleSort('status')}
+                onMouseEnter={() => setHoveredColumn('status')}
+                onMouseLeave={() => setHoveredColumn(null)}
+              >
+                <div className="flex items-center gap-2">
+                  <span>Status</span>
+                  {getSortIcon('status')}
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                onClick={() => handleSort('jobType')}
+                onMouseEnter={() => setHoveredColumn('jobType')}
+                onMouseLeave={() => setHoveredColumn(null)}
+              >
+                <div className="flex items-center gap-2">
+                  <span>Job Type</span>
+                  {getSortIcon('jobType')}
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                onClick={() => handleSort('matchScore')}
+                onMouseEnter={() => setHoveredColumn('matchScore')}
+                onMouseLeave={() => setHoveredColumn(null)}
+              >
+                <div className="flex items-center gap-2">
+                  <span>Match Score</span>
+                  {getSortIcon('matchScore')}
+                </div>
+              </th>
+              <th 
+                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                onClick={() => handleSort('campaign')}
+                onMouseEnter={() => setHoveredColumn('campaign')}
+                onMouseLeave={() => setHoveredColumn(null)}
+              >
+                <div className="flex items-center gap-2">
+                  <span>Campaign</span>
+                  {getSortIcon('campaign')}
+                </div>
+              </th>
+              <th className="px-6 py-4 text-left text-sm text-gray-600">CV</th>
+            </tr>
+          </thead>
         )}
         <tbody>
             {sortedCandidates.map((candidate) => {
