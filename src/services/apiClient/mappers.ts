@@ -52,12 +52,22 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
   // Default to submitted if still not found
   status = status || "submitted";
 
-  // Map job type
+  // Map job type - handle both server format (e.g., "Operational") and internal format (e.g., "operational_worker")
   const jobTypeMap: Record<string, JobType> = {
+    // Internal/snake_case format
     headquarters_staff: "headquarters_staff",
     training_instruction: "training_instruction",
     sales: "sales",
     operational_worker: "operational_worker",
+    // Server format (capitalized)
+    "Headquarters Staff": "headquarters_staff",
+    "Headquarters": "headquarters_staff",
+    "Training/Instruction": "training_instruction",
+    "Training": "training_instruction",
+    "Instruction": "training_instruction",
+    "Sales": "sales",
+    "Operational Worker": "operational_worker",
+    "Operational": "operational_worker",
   };
   // If job_type is null or empty, keep it as null (don't default to headquarters_staff)
   const jobType = knownData.job_type && knownData.job_type !== "null"
