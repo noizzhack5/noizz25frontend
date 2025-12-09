@@ -12,6 +12,7 @@ interface CandidatesTableProps {
   showDeleted?: boolean;
   isSimplified?: boolean;
   hideHeader?: boolean;
+  stickyHeaderTop?: string;
 }
 
 const getJobTypeLabel = (jobType: string | null | undefined): string | null => {
@@ -53,7 +54,8 @@ export function CandidatesTable({
   selectedCandidateId,
   showDeleted = false,
   isSimplified = false,
-  hideHeader = false
+  hideHeader = false,
+  stickyHeaderTop
 }: CandidatesTableProps) {
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
   const [hoveredColumn, setHoveredColumn] = useState<SortField>(null);
@@ -78,11 +80,7 @@ export function CandidatesTable({
   const getSortIcon = (field: SortField) => {
     const isActive = sortField === field;
     const isHovered = hoveredColumn === field;
-    
-    // Only show icon if column is hovered or actively sorted
-    if (!isActive && !isHovered) {
-      return null;
-    }
+    const isVisible = isActive || isHovered;
 
     if (isActive) {
       if (sortDirection === 'desc') {
@@ -93,8 +91,8 @@ export function CandidatesTable({
       }
     }
     
-    // Hovered but not active
-    return <ArrowUpDown size={14} className="text-gray-400" />;
+    // Always render icon to reserve space, use opacity to show/hide
+    return <ArrowUpDown size={14} className={isVisible ? "text-gray-400" : "opacity-0"} />;
   };
 
   if (candidates.length === 0) {
@@ -181,73 +179,117 @@ export function CandidatesTable({
     );
   }
 
+  // Column widths for alignment between sticky header and body
+  const columnWidths = ['20%', '16%', '16%', '16%', '20%', '12%'];
+
+  // Render the header row content (shared between sticky and non-sticky)
+  const renderHeaderRow = () => (
+    <tr>
+      <th 
+        className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
+        style={{ width: columnWidths[0] }}
+        onClick={() => handleSort('name')}
+        onMouseEnter={() => setHoveredColumn('name')}
+        onMouseLeave={() => setHoveredColumn(null)}
+      >
+        <div className="flex items-center gap-2">
+          <span>Full Name</span>
+          {getSortIcon('name')}
+        </div>
+      </th>
+      <th 
+        className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
+        style={{ width: columnWidths[1] }}
+        onClick={() => handleSort('status')}
+        onMouseEnter={() => setHoveredColumn('status')}
+        onMouseLeave={() => setHoveredColumn(null)}
+      >
+        <div className="flex items-center gap-2">
+          <span>Status</span>
+          {getSortIcon('status')}
+        </div>
+      </th>
+      <th 
+        className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
+        style={{ width: columnWidths[2] }}
+        onClick={() => handleSort('jobType')}
+        onMouseEnter={() => setHoveredColumn('jobType')}
+        onMouseLeave={() => setHoveredColumn(null)}
+      >
+        <div className="flex items-center gap-2">
+          <span>Job Type</span>
+          {getSortIcon('jobType')}
+        </div>
+      </th>
+      <th 
+        className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
+        style={{ width: columnWidths[3] }}
+        onClick={() => handleSort('matchScore')}
+        onMouseEnter={() => setHoveredColumn('matchScore')}
+        onMouseLeave={() => setHoveredColumn(null)}
+      >
+        <div className="flex items-center gap-2">
+          <span>Match Score</span>
+          {getSortIcon('matchScore')}
+        </div>
+      </th>
+      <th 
+        className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
+        style={{ width: columnWidths[4] }}
+        onClick={() => handleSort('campaign')}
+        onMouseEnter={() => setHoveredColumn('campaign')}
+        onMouseLeave={() => setHoveredColumn(null)}
+      >
+        <div className="flex items-center gap-2">
+          <span>Campaign</span>
+          {getSortIcon('campaign')}
+        </div>
+      </th>
+      <th 
+        className="px-6 py-4 text-left text-sm text-gray-600 font-normal"
+        style={{ width: columnWidths[5] }}
+      >
+        CV
+      </th>
+    </tr>
+  );
+
   // Full view - all columns
   return (
-    <div className={`border border-gray-200 ${hideHeader ? 'border-t-0 rounded-b-lg' : 'rounded-lg'}`}>
-      <table className="w-full border-collapse">
-        {!hideHeader && (
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('name')}
-                onMouseEnter={() => setHoveredColumn('name')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Full Name</span>
-                  {getSortIcon('name')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('status')}
-                onMouseEnter={() => setHoveredColumn('status')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Status</span>
-                  {getSortIcon('status')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('jobType')}
-                onMouseEnter={() => setHoveredColumn('jobType')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Job Type</span>
-                  {getSortIcon('jobType')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('matchScore')}
-                onMouseEnter={() => setHoveredColumn('matchScore')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Match Score</span>
-                  {getSortIcon('matchScore')}
-                </div>
-              </th>
-              <th 
-                className="px-6 py-4 text-left text-sm text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                onClick={() => handleSort('campaign')}
-                onMouseEnter={() => setHoveredColumn('campaign')}
-                onMouseLeave={() => setHoveredColumn(null)}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Campaign</span>
-                  {getSortIcon('campaign')}
-                </div>
-              </th>
-              <th className="px-6 py-4 text-left text-sm text-gray-600">CV</th>
-            </tr>
-          </thead>
-        )}
-        <tbody>
+    <div>
+      {/* Sticky Header */}
+      {!hideHeader && stickyHeaderTop && (
+        <div 
+          className="sticky z-10 border border-gray-200 border-b-0 rounded-t-lg bg-gray-50"
+          style={{ 
+            top: stickyHeaderTop,
+            boxShadow: '0 -20px 0 20px white'
+          }}
+        >
+          <table className="w-full table-fixed border-collapse">
+            <thead>
+              {renderHeaderRow()}
+            </thead>
+          </table>
+        </div>
+      )}
+
+      {/* Table Body (with header when not sticky) */}
+      <div className={`border border-gray-200 ${stickyHeaderTop ? 'border-t-0 rounded-b-lg' : 'rounded-lg'}`}>
+        <table className={`w-full border-collapse ${stickyHeaderTop ? 'table-fixed' : ''}`}>
+          {!hideHeader && !stickyHeaderTop && (
+            <thead className="bg-gray-50 border-b border-gray-200">
+              {renderHeaderRow()}
+            </thead>
+          )}
+          {stickyHeaderTop && (
+            <colgroup>
+              {columnWidths.map((width, i) => (
+                <col key={i} style={{ width }} />
+              ))}
+            </colgroup>
+          )}
+          <tbody>
             {sortedCandidates.map((candidate) => {
               const isNew = isRecentlyAdded(candidate);
               const hasStatusChange = hasRecentStatusChange(candidate);
@@ -382,6 +424,7 @@ export function CandidatesTable({
             })}
           </tbody>
         </table>
+      </div>
     </div>
   );
 }

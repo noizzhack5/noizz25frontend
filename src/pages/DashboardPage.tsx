@@ -10,11 +10,7 @@ import { ExcitingNotification } from "@/components/ExcitingNotification";
 import { ResumeViewer } from "@/components/ResumeViewer";
 import { Toast } from "@/components/Toast";
 import { useUIStore } from "@/features/store/uiStore";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import type { Candidate, Status, JobType } from "@/types";
-
-type SortField = 'name' | 'status' | 'jobType' | 'matchScore' | 'campaign' | null;
-type SortDirection = 'asc' | 'desc' | null;
 
 export function DashboardPage() {
   const {
@@ -72,48 +68,6 @@ export function DashboardPage() {
     message: string;
     type: "success" | "error" | "info";
   } | null>(null);
-
-  // Sorting state
-  const [sortField, setSortField] = useState<SortField>('matchScore');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [hoveredColumn, setHoveredColumn] = useState<SortField>(null);
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      // Cycle through: desc -> asc -> null
-      if (sortDirection === 'desc') {
-        setSortDirection('asc');
-      } else if (sortDirection === 'asc') {
-        setSortField(null);
-        setSortDirection(null);
-      }
-    } else {
-      setSortField(field);
-      setSortDirection('desc');
-    }
-  };
-
-  const getSortIcon = (field: SortField) => {
-    const isActive = sortField === field;
-    const isHovered = hoveredColumn === field;
-    
-    // Only show icon if column is hovered or actively sorted
-    if (!isActive && !isHovered) {
-      return null;
-    }
-
-    if (isActive) {
-      if (sortDirection === 'desc') {
-        return <ArrowDown size={14} className="text-black" />;
-      }
-      if (sortDirection === 'asc') {
-        return <ArrowUp size={14} className="text-black" />;
-      }
-    }
-    
-    // Hovered but not active
-    return <ArrowUpDown size={14} className="text-gray-400" />;
-  };
 
   const getJobTypeLabel = (jobType: string | null | undefined): string | null => {
     if (!jobType || jobType === 'null' || jobType === null) {
@@ -294,44 +248,6 @@ export function DashboardPage() {
     countriesFilter,
   ]);
 
-  const sortedCandidates = useMemo(() => {
-    // Sort all candidates based on sortField and sortDirection
-    return [...filteredCandidates].sort((a, b) => {
-      if (!sortField || !sortDirection) {
-        // Default sort by match score descending
-        const scoreA = a.primaryGroup.matchScore ?? -1;
-        const scoreB = b.primaryGroup.matchScore ?? -1;
-        return scoreB - scoreA;
-      }
-
-      let comparison = 0;
-
-      switch (sortField) {
-        case 'name':
-          comparison = a.fullName.localeCompare(b.fullName);
-          break;
-        case 'status':
-          const statusOrder: Record<string, number> = { submitted: 0, bot_interview: 1, ready_for_bot_interview: 2, ready_for_recruit: 3 };
-          comparison = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0);
-          break;
-        case 'jobType':
-          const jobTypeA = getJobTypeLabel(a.jobType) || '';
-          const jobTypeB = getJobTypeLabel(b.jobType) || '';
-          comparison = jobTypeA.localeCompare(jobTypeB);
-          break;
-        case 'matchScore':
-          const scoreA = a.primaryGroup.matchScore ?? -1;
-          const scoreB = b.primaryGroup.matchScore ?? -1;
-          comparison = scoreA - scoreB;
-          break;
-        case 'campaign':
-          comparison = a.campaignSource.localeCompare(b.campaignSource);
-          break;
-      }
-
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-  }, [filteredCandidates, sortField, sortDirection]);
 
   const handleUpdateCandidate = async (updatedCandidate: Candidate) => {
     try {
@@ -418,7 +334,7 @@ export function DashboardPage() {
         countriesFilter={countriesFilter}
       />
 
-      {/* Filter Bar and Table Header - Combined Sticky */}
+      {/* Filter Bar */}
       <div className="sticky top-14 z-20 bg-white pt-4 -mt-4">
         <FilterBar
           statusFilter={statusFilter}
@@ -436,77 +352,12 @@ export function DashboardPage() {
           onCountriesFilterChange={setCountriesFilter}
           availableCountries={availableCountries}
         />
-        {/* Sticky Table Header */}
-        <div className="border border-gray-200 border-b-0 rounded-t-lg bg-gray-50">
-          <table className="w-full border-collapse">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                  onClick={() => handleSort('name')}
-                  onMouseEnter={() => setHoveredColumn('name')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Full Name</span>
-                    {getSortIcon('name')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                  onClick={() => handleSort('status')}
-                  onMouseEnter={() => setHoveredColumn('status')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Status</span>
-                    {getSortIcon('status')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                  onClick={() => handleSort('jobType')}
-                  onMouseEnter={() => setHoveredColumn('jobType')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Job Type</span>
-                    {getSortIcon('jobType')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                  onClick={() => handleSort('matchScore')}
-                  onMouseEnter={() => setHoveredColumn('matchScore')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Match Score</span>
-                    {getSortIcon('matchScore')}
-                  </div>
-                </th>
-                <th 
-                  className="px-6 py-4 text-left text-sm text-gray-600 font-normal cursor-pointer hover:bg-gray-100 transition-colors select-none"
-                  onClick={() => handleSort('campaign')}
-                  onMouseEnter={() => setHoveredColumn('campaign')}
-                  onMouseLeave={() => setHoveredColumn(null)}
-                >
-                  <div className="flex items-center gap-2">
-                    <span>Campaign</span>
-                    {getSortIcon('campaign')}
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">CV</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
       </div>
 
       {/* Candidates Table */}
       <CandidatesTable
-        candidates={sortedCandidates}
-        hideHeader={true}
+        candidates={filteredCandidates}
+        stickyHeaderTop="124px"
         onSelectCandidate={setSelectedCandidate}
         onDeleteCandidate={async (id) => {
           try {
