@@ -68,46 +68,26 @@ const getStatusColor = (status: string) => {
   return colors[status] || '#6B7280';
 };
 
-const YesNoField = ({ value, source }: { value?: boolean; source?: 'cv' | 'chatbot' }) => {
+const YesNoField = ({ value }: { value?: boolean }) => {
   if (value === undefined) {
-    return (
-      <span className="inline-flex items-center gap-2">
-        <span className="text-red-500">Missing</span>
-      </span>
-    );
+    return <span className="text-red-500">Missing</span>;
   }
   return (
-    <span className="inline-flex items-center gap-2">
-      <span className={value ? 'text-green-600' : 'text-red-600'}>
-        {value ? 'Yes' : 'No'}
-      </span>
-      {source && (
-        <span className={`text-xs px-2 py-0.5 rounded ${source === 'cv' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
-          {source === 'cv' ? 'CV' : 'Chatbot'}
-        </span>
-      )}
+    <span className={value ? 'text-green-600' : 'text-red-600'}>
+      {value ? 'Yes' : 'No'}
     </span>
   );
 };
 
-const DataField = ({ label, value, source, missing }: { label: string; value?: string | number; source?: 'cv' | 'chatbot'; missing?: boolean }) => {
+const DataField = ({ label, value, missing }: { label: string; value?: string | number; missing?: boolean }) => {
   return (
     <div>
       <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <div className="flex items-center gap-2">
-        {missing ? (
-          <span className="text-red-400 text-sm">Missing</span>
-        ) : (
-          <>
-            <span className="text-gray-900">{value}</span>
-            {source && (
-              <span className={`text-xs px-2 py-0.5 rounded ${source === 'cv' ? 'bg-gray-100 text-gray-600' : 'bg-gray-100 text-gray-600'}`}>
-                {source === 'cv' ? 'CV' : 'Bot'}
-              </span>
-            )}
-          </>
-        )}
-      </div>
+      {missing ? (
+        <span className="text-red-400 text-sm">Missing</span>
+      ) : (
+        <span className="text-gray-900">{value}</span>
+      )}
     </div>
   );
 };
@@ -533,10 +513,10 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <h4 className="text-xs text-gray-500 mb-3">Personal Information</h4>
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 md:gap-x-4 sm:gap-x-[30px] gap-y-3">
-                  <DataField label="Full Name" value={candidate.fullName} source="cv" />
-                  <DataField label="Full Name (Hebrew)" value={candidate.fullNameHebrew} source="cv" missing={!candidate.fullNameHebrew} />
-                  <DataField label="Age" value={candidate.age} source="cv" missing={!candidate.age} />
-                  <DataField label="Citizenship" value={candidate.citizenship} source="cv" missing={!candidate.citizenship} />
+                  <DataField label="Full Name" value={candidate.fullName} />
+                  <DataField label="Full Name (Hebrew)" value={candidate.fullNameHebrew} missing={!candidate.fullNameHebrew} />
+                  <DataField label="Age" value={candidate.age} missing={!candidate.age} />
+                  <DataField label="Citizenship" value={candidate.citizenship} missing={!candidate.citizenship} />
                 </div>
               </div>
             </div>
@@ -547,19 +527,19 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <div className="space-y-2">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Can travel in/to Europe</p>
-                  <YesNoField value={candidate.canTravelEurope} source="chatbot" />
+                  <YesNoField value={candidate.canTravelEurope} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Can travel to Israel</p>
-                  <YesNoField value={candidate.canTravelIsrael} source="chatbot" />
+                  <YesNoField value={candidate.canTravelIsrael} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Do they live actually in Europe</p>
-                  <YesNoField value={candidate.livesInEurope} source="chatbot" />
+                  <YesNoField value={candidate.livesInEurope} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Are they native Israeli</p>
-                  <YesNoField value={candidate.nativeIsraeli} source="chatbot" />
+                  <YesNoField value={candidate.nativeIsraeli} />
                 </div>
               </div>
             </div>
@@ -570,11 +550,11 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <div className="space-y-2">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Does the candidate speak good English</p>
-                  <YesNoField value={candidate.speaksEnglish} source="chatbot" />
+                  <YesNoField value={candidate.speaksEnglish} />
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Do they remember the position they applied for</p>
-                  <YesNoField value={candidate.remembersPosition} source="chatbot" />
+                  <YesNoField value={candidate.remembersPosition} />
                 </div>
               </div>
             </div>
