@@ -257,7 +257,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                     title="Filter by Ready for Recruit"
                   >
                     <div className="w-2 h-2 rounded-full bg-[#10B981]"></div>
-                    <span className="text-xs text-gray-600">{readyCount} Ready</span>
+                    <span className="text-xs text-gray-600">{readyCount} Ready For Recruit</span>
                   </button>
                 </div>
               </div>
