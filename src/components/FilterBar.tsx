@@ -105,8 +105,6 @@ export function FilterBar({
     if (statusFilter === 'all') return 'All Statuses';
     const labels: Record<Status, string> = {
       submitted: 'Submitted',
-      waiting_for_bot_conversation: 'Waiting for Bot Conversation',
-      waiting_for_bot_interview: 'Waiting for Bot Interview',
       bot_interview: 'Bot Interview',
       ready_for_bot_interview: 'Ready for Bot Interview',
       ready_for_recruit: 'Ready for Recruit'
@@ -144,8 +142,6 @@ export function FilterBar({
   const statusOptions: Array<{ value: Status | 'all'; label: string }> = [
     { value: 'all', label: 'All Statuses' },
     { value: 'submitted', label: 'Submitted' },
-    { value: 'waiting_for_bot_conversation', label: 'Waiting for Bot Conversation' },
-    { value: 'waiting_for_bot_interview', label: 'Waiting for Bot Interview' },
     { value: 'bot_interview', label: 'Bot Interview' },
     { value: 'ready_for_bot_interview', label: 'Ready for Bot Interview' },
     { value: 'ready_for_recruit', label: 'Ready for Recruit' }

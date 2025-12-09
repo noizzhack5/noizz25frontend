@@ -6,4 +6,8 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         value: https://noizz25backend.onrender.com
+envVars:
+- key: NODE_VERSION
+  value: 18
+
 

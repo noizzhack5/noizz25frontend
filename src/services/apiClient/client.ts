@@ -179,14 +179,20 @@ class ApiClient {
 
   /**
    * Update CV status
+   * Accepts either statusId (number) or status (string)
    */
   async updateCVStatus(
     id: string,
-    statusId: number
+    statusIdOrStatus: number | string
   ): Promise<CVDocument> {
+    const body: import("./types").StatusUpdateRequest = 
+      typeof statusIdOrStatus === "number"
+        ? { status_id: statusIdOrStatus }
+        : { status: statusIdOrStatus };
+    
     return this.request<CVDocument>(`/cv/${id}/status`, {
       method: "PATCH",
-      body: JSON.stringify({ status_id: statusId }),
+      body: JSON.stringify(body),
     });
   }
 

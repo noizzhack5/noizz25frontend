@@ -5,6 +5,7 @@ import {
   mapCVDocumentToCandidate,
   mapCandidateToCVUpdateRequest,
   mapStatusToStatusId,
+  mapStatusToStatusString,
 } from "@/services/apiClient/mappers";
 
 interface CandidatesState {
@@ -100,7 +101,7 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
     try {
       const searchParams: import("@/services/apiClient/types").CVSearchParams = {
         free_text: state.searchQuery || null,
-        current_status: state.statusFilter !== "all" ? state.statusFilter : null,
+        current_status: state.statusFilter !== "all" ? mapStatusToStatusString(state.statusFilter) : null,
         job_type: state.jobTypeFilter !== "all" ? state.jobTypeFilter : null,
         match_score: state.matchFilter !== "all" ? (state.matchFilter as any) : null,
         campaign: state.campaignFilter !== "all" ? state.campaignFilter : null,
@@ -239,8 +240,8 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
   updateCandidateStatus: async (id, status) => {
     set({ isLoading: true, error: null });
     try {
-      const statusId = mapStatusToStatusId(status);
-      const doc = await apiClient.updateCVStatus(id, statusId);
+      const statusString = mapStatusToStatusString(status);
+      const doc = await apiClient.updateCVStatus(id, statusString);
       const updatedCandidate = mapCVDocumentToCandidate(doc);
       
       set((state) => ({

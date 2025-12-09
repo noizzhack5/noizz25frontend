@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { StatusBadge } from './StatusBadge';
 import { ChatbotPreviewModal } from './ChatbotPreviewModal';
+import { apiClient, ApiError } from '@/services/apiClient';
 
 interface CandidateCardProps {
   candidate: Candidate;
@@ -165,6 +166,8 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
   const [conversationStarted, setConversationStarted] = useState(false);
   const [matchFeedback, setMatchFeedback] = useState<'like' | 'dislike' | null>(null);
   const [showNotesSaveButton, setShowNotesSaveButton] = useState(false);
+  const [isStartingBot, setIsStartingBot] = useState(false);
+  const [botError, setBotError] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const statusColor = getStatusColor(candidate.status);
   
@@ -675,6 +678,11 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
               <p className="text-sm text-gray-700 leading-relaxed">
                 This will initiate a new WhatsApp bot conversation with <strong>{candidate.fullName}</strong>.
               </p>
+              {botError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{botError}</p>
+                </div>
+              )}
             </div>
             
             {/* Modal Actions */}
@@ -686,15 +694,30 @@ export function CandidateCard({ candidate, onClose, onStatusChange }: CandidateC
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  setShowBotConfirmation(false);
-                  setConversationStarted(true);
-                  // Update candidate status to 'bot_interview'
-                  onStatusChange(candidate.id, 'bot_interview');
+                onClick={async () => {
+                  setIsStartingBot(true);
+                  setBotError(null);
+                  try {
+                    // Call the API to trigger bot processor
+                    await apiClient.triggerBotProcessor();
+                    // Update candidate status to 'bot_interview'
+                    onStatusChange(candidate.id, 'bot_interview');
+                    setConversationStarted(true);
+                    setShowBotConfirmation(false);
+                  } catch (error) {
+                    const message = error instanceof ApiError 
+                      ? error.message 
+                      : 'Failed to start bot conversation';
+                    setBotError(message);
+                    console.error('Error starting bot conversation:', error);
+                  } finally {
+                    setIsStartingBot(false);
+                  }
                 }}
-                className="px-5 py-2 bg-[#F3CB06] text-black rounded-lg hover:bg-[#d4b305] transition-colors text-sm flex items-center gap-2"
+                disabled={isStartingBot}
+                className="px-5 py-2 bg-[#F3CB06] text-black rounded-lg hover:bg-[#d4b305] transition-colors text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Yes I'm sure
+                {isStartingBot ? 'Starting...' : "Yes I'm sure"}
               </button>
             </div>
           </div>

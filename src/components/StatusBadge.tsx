@@ -10,14 +10,6 @@ const statusConfig = {
     label: 'Submitted',
     className: 'bg-blue-100 text-blue-700'
   },
-  waiting_for_bot_conversation: {
-    label: 'Waiting for Bot Conversation',
-    className: 'bg-indigo-100 text-indigo-700'
-  },
-  waiting_for_bot_interview: {
-    label: 'Waiting for Bot Interview',
-    className: 'bg-purple-100 text-purple-700'
-  },
   bot_interview: {
     label: 'Bot Interview',
     className: 'bg-yellow-100 text-yellow-700'

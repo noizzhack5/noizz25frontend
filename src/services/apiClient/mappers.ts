@@ -8,25 +8,29 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
   const knownData = doc.known_data || {};
   
   // Map status from API string to frontend status
+  // Using current_status from API response
   const statusMap: Record<string, Status> = {
     "Received": "submitted",
     "Submitted": "submitted",
     "Extracting": "submitted",
-    "Waiting Bot Interview": "waiting_for_bot_interview",
+    "Waiting Bot Interview": "submitted",
+    "Ready for Bot Interview": "ready_for_bot_interview",
     "Bot Interview": "bot_interview",
-    "Waiting Classification": "waiting_for_bot_interview",
-    "In Classification": "bot_interview",
+    "Waiting Classification": "submitted",
+    "In Classification": "ready_for_bot_interview",
     "Ready For Recruit": "ready_for_recruit",
+    "Ready for Recruit": "ready_for_recruit",
     // Numeric statuses (if still used)
     "1": "submitted",
     "2": "submitted",
-    "3": "waiting_for_bot_interview",
+    "3": "submitted",
     "4": "bot_interview",
-    "5": "waiting_for_bot_interview",
-    "6": "bot_interview",
+    "5": "submitted",
+    "6": "ready_for_bot_interview",
     "7": "ready_for_recruit",
   };
 
+  // Use current_status directly from API
   const apiStatus = doc.current_status || "Received";
   const status = statusMap[apiStatus] || "submitted";
 
@@ -69,7 +73,9 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
   const speaksEnglish =
     knownData.english_level && 
     knownData.english_level.toLowerCase() !== "none" &&
-    knownData.english_level.toLowerCase() !== "";
+    knownData.english_level.toLowerCase() !== "" 
+    ? true 
+    : false;
   const remembersPosition =
     knownData.remembers_job_application?.toLowerCase() === "yes" ||
     knownData.remembers_job_application?.toLowerCase() === "true";
@@ -148,7 +154,22 @@ export function mapCandidateToCVUpdateRequest(
 }
 
 /**
- * Maps frontend Status to API status_id
+ * Maps frontend Status to API status string format
+ * Converts snake_case to Title Case with spaces
+ * Example: "ready_for_bot_interview" -> "Ready For Bot Interview"
+ */
+export function mapStatusToStatusString(status: Status): string {
+  const statusMap: Record<Status, string> = {
+    submitted: "Submitted",
+    bot_interview: "Bot Interview",
+    ready_for_bot_interview: "Ready For Bot Interview",
+    ready_for_recruit: "Ready For Recruit",
+  };
+  return statusMap[status] || "Submitted";
+}
+
+/**
+ * Maps frontend Status to API status_id (legacy - kept for backward compatibility)
  * Note: The API uses status_id (1-7) but also accepts status strings
  * Status IDs: 1=Submitted, 2=Extracting, 3=Waiting Bot Interview, 
  *             4=Bot Interview, 5=Waiting Classification, 6=In Classification, 7=Ready For Recruit
@@ -156,8 +177,6 @@ export function mapCandidateToCVUpdateRequest(
 export function mapStatusToStatusId(status: Status): number {
   const statusMap: Record<Status, number> = {
     submitted: 1,
-    waiting_for_bot_conversation: 3,
-    waiting_for_bot_interview: 3,
     bot_interview: 4,
     ready_for_bot_interview: 5,
     ready_for_recruit: 7,

@@ -34,7 +34,8 @@ export interface CVUpdateRequest {
 }
 
 export interface StatusUpdateRequest {
-  status_id: number; // 1-7
+  status_id?: number; // 1-7 (legacy)
+  status?: string; // Status as string (e.g., "Ready For Bot Interview")
 }
 
 export interface ValidationError {

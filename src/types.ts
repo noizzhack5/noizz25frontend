@@ -1,4 +1,4 @@
-export type Status = 'submitted' | 'waiting_for_bot_conversation' | 'waiting_for_bot_interview' | 'bot_interview' | 'ready_for_bot_interview' | 'ready_for_recruit';
+export type Status = 'submitted' | 'bot_interview' | 'ready_for_bot_interview' | 'ready_for_recruit';
 
 export type JobType = 'headquarters_staff' | 'training_instruction' | 'sales' | 'operational_worker';
 

@@ -290,8 +290,8 @@ export function DashboardPage() {
     }
   };
 
-  const handleStatusFilterClick = (status: Status) => {
-    setStatusFilter(status);
+  const handleStatusFilterClick = (status: Status | 'all') => {
+    setStatusFilter(status === 'all' ? 'all' : status);
   };
 
   const handleCountryFilterClick = (country: string) => {

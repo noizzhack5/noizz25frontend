@@ -122,7 +122,7 @@ export function CandidatesTable({
         comparison = a.fullName.localeCompare(b.fullName);
         break;
       case 'status':
-        const statusOrder = { submitted: 0, waiting_for_bot_conversation: 1, waiting_for_bot_interview: 2, bot_interview: 3, ready_for_bot_interview: 4, ready_for_recruit: 5 };
+        const statusOrder = { submitted: 0, bot_interview: 1, ready_for_bot_interview: 2, ready_for_recruit: 3 };
         comparison = statusOrder[a.status] - statusOrder[b.status];
         break;
       case 'jobType':
