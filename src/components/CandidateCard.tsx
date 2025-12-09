@@ -23,6 +23,11 @@ const getJobTypeLabel = (jobType: string) => {
   return labels[jobType] || jobType;
 };
 
+// Generate a consistent random avatar URL based on candidate ID
+const getRandomAvatarUrl = (candidateId: string, size: number = 200) => {
+  return `https://i.pravatar.cc/${size}?u=${candidateId}`;
+};
+
 const getJobTypeParameters = (jobType: string): string[] => {
   const parameters: Record<string, string[]> = {
     headquarters_staff: [
@@ -231,7 +236,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                   <img 
-                    src={candidate.profileImage || 'https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NDk4Mjc0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'} 
+                    src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 80)} 
                     alt={candidate.fullName} 
                     className="w-full h-full object-cover" 
                   />
@@ -298,7 +303,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
         <div className="flex flex-col items-center space-y-1">
           <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden">
             <img 
-              src={candidate.profileImage || 'https://images.unsplash.com/photo-1672685667592-0392f458f46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMHBvcnRyYWl0fGVufDF8fHx8MTc2NDk4Mjc0MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral'} 
+              src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 200)} 
               alt={candidate.fullName} 
               className="w-full h-full object-cover" 
             />
