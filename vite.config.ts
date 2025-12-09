@@ -56,11 +56,12 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true, // ⬅ חשוב ל-Render
-    open: false, // ⬅ Render לא תומך ב-open
+    host: true, 
+    open: false, 
+    allowedHosts: ['noizz25frontend.onrender.com']
   },
   preview: {
-    host: '0.0.0.0', // ⬅ חובה כדי ש-Render יזהה פורט
+    host: '0.0.0.0',
     port: 3000,
   },
 });
