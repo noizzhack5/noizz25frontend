@@ -67,7 +67,15 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
     try {
       const docs = await apiClient.getAllCVs(false);
       const candidates = docs.map(mapCVDocumentToCandidate);
-      set({ candidates, isLoading: false });
+      const currentSelectedId = get().selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? candidates.find(c => c.id === currentSelectedId) || null
+        : null;
+      set({ 
+        candidates, 
+        selectedCandidate: updatedSelectedCandidate,
+        isLoading: false 
+      });
     } catch (error) {
       const message =
         error instanceof ApiError
@@ -83,7 +91,15 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
     try {
       const docs = await apiClient.getAllCVs(true);
       const candidates = docs.map(mapCVDocumentToCandidate);
-      set({ candidates, isLoading: false });
+      const currentSelectedId = get().selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? candidates.find(c => c.id === currentSelectedId) || null
+        : null;
+      set({ 
+        candidates, 
+        selectedCandidate: updatedSelectedCandidate,
+        isLoading: false 
+      });
     } catch (error) {
       const message =
         error instanceof ApiError
@@ -110,7 +126,15 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
 
       const docs = await apiClient.searchCVs(searchParams);
       const candidates = docs.map(mapCVDocumentToCandidate);
-      set({ candidates, isLoading: false });
+      const currentSelectedId = state.selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? candidates.find(c => c.id === currentSelectedId) || null
+        : null;
+      set({ 
+        candidates, 
+        selectedCandidate: updatedSelectedCandidate,
+        isLoading: false 
+      });
     } catch (error) {
       const message =
         error instanceof ApiError
