@@ -15,7 +15,7 @@ export interface MatchParameter {
 
 export interface GroupClassification {
   groupName: string;
-  matchScore: number;
+  matchScore: number | null;
 }
 
 export interface AdditionalInfo {
@@ -45,7 +45,7 @@ export interface Candidate {
   citizenship?: string;
   campaignSource: string;
   status: Status | string;
-  jobType: JobType;
+  jobType: JobType | null;
   statusHistory: StatusHistory[];
   primaryGroup: GroupClassification;
   alternativeGroups: GroupClassification[];

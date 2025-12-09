@@ -9,12 +9,14 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
   
   // Map status from API string to frontend status
   // Using current_status from API response
+  // Note: API returns statuses with capital letters like "Ready For Bot Interview"
   const statusMap: Record<string, Status> = {
     "Received": "submitted",
     "Submitted": "submitted",
     "Extracting": "submitted",
     "Waiting Bot Interview": "submitted",
     "Ready for Bot Interview": "ready_for_bot_interview",
+    "Ready For Bot Interview": "ready_for_bot_interview", // API returns with capital F
     "Bot Interview": "bot_interview",
     "Waiting Classification": "submitted",
     "In Classification": "ready_for_bot_interview",
@@ -25,14 +27,30 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     "2": "submitted",
     "3": "submitted",
     "4": "bot_interview",
-    "5": "submitted",
+    "5": "ready_for_bot_interview", // Fixed: 5 should map to ready_for_bot_interview
     "6": "ready_for_bot_interview",
     "7": "ready_for_recruit",
   };
 
   // Use current_status directly from API
   const apiStatus = doc.current_status || "Received";
-  const status = statusMap[apiStatus] || "submitted";
+  
+  // Try exact match first
+  let status = statusMap[apiStatus];
+  
+  // If not found, try case-insensitive match
+  if (!status) {
+    const lowerApiStatus = apiStatus.toLowerCase();
+    const foundKey = Object.keys(statusMap).find(
+      key => key.toLowerCase() === lowerApiStatus
+    );
+    if (foundKey) {
+      status = statusMap[foundKey];
+    }
+  }
+  
+  // Default to submitted if still not found
+  status = status || "submitted";
 
   // Map job type
   const jobTypeMap: Record<string, JobType> = {
@@ -41,8 +59,10 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     sales: "sales",
     operational_worker: "operational_worker",
   };
-  const jobType =
-    jobTypeMap[knownData.job_type || ""] || "headquarters_staff";
+  // If job_type is null or empty, keep it as null (don't default to headquarters_staff)
+  const jobType = knownData.job_type && knownData.job_type !== "null"
+    ? (jobTypeMap[knownData.job_type] || null)
+    : null;
 
   // Map status history
   const statusHistory: StatusHistory[] =
@@ -52,10 +72,10 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
       note: h.note,
     })) || [];
 
-  // Parse match score
-  const matchScore = knownData.match_score
+  // Parse match score - keep as null if not provided
+  const matchScore = knownData.match_score && knownData.match_score !== "null" && knownData.match_score !== ""
     ? parseFloat(knownData.match_score)
-    : 0;
+    : null;
 
   // Map boolean fields from known_data
   const canTravelEurope =
