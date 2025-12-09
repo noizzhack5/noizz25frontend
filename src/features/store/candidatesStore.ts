@@ -27,7 +27,7 @@ interface CandidatesState {
   fetchDeletedCandidates: () => Promise<void>;
   searchCandidates: () => Promise<void>;
   setCandidates: (candidates: Candidate[]) => void;
-  addCandidate: (candidate: Omit<Candidate, "id">) => Promise<void>;
+  addCandidate: (candidate: Omit<Candidate, "id">, file?: File) => Promise<import("@/services/apiClient/types").CVUploadResponse>;
   updateCandidate: (id: string, updates: Partial<Candidate>) => Promise<void>;
   deleteCandidate: (id: string) => Promise<void>;
   restoreCandidate: (id: string) => Promise<void>;
@@ -122,16 +122,26 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
 
   setCandidates: (candidates) => set({ candidates }),
   
-  addCandidate: async (candidateData) => {
+  addCandidate: async (candidateData, file?: File) => {
     set({ isLoading: true, error: null });
     try {
-      // For now, we'll need to upload via the upload endpoint
-      // This is a simplified version - in production, you'd handle file uploads
-      const updateRequest = mapCandidateToCVUpdateRequest(candidateData);
+      // Use the upload CV endpoint
+      const uploadData: import("@/services/apiClient/types").BodyUploadCv = {
+        file: file || null,
+        name: candidateData.fullName || null,
+        phone: candidateData.phone || null,
+        email: candidateData.email || null,
+        campaign: candidateData.campaignSource || null,
+        notes: candidateData.notes || null,
+      };
+
+      const response = await apiClient.uploadCV(uploadData);
       
-      // Note: The API requires a file upload for new candidates
-      // This is a placeholder - you'll need to implement file upload UI
-      throw new Error("Please use the upload CV form to add new candidates");
+      // Refresh the candidates list to include the new one
+      await get().fetchCandidates();
+      
+      set({ isLoading: false });
+      return response;
     } catch (error) {
       const message =
         error instanceof ApiError || error instanceof Error
