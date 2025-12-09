@@ -173,7 +173,7 @@ export function DashboardPage() {
           candidate.status.toLowerCase().includes(query) ||
           getStatusLabel(candidate.status).toLowerCase().includes(query) ||
           candidate.primaryGroup.groupName.toLowerCase().includes(query) ||
-          candidate.primaryGroup.matchScore.toString().includes(query) ||
+          (candidate.primaryGroup.matchScore !== null && candidate.primaryGroup.matchScore.toString().includes(query)) ||
           candidate.alternativeGroups?.some(
             (group) =>
               group.groupName.toLowerCase().includes(query) ||
@@ -200,6 +200,7 @@ export function DashboardPage() {
     if (matchFilter !== "all") {
       filtered = filtered.filter((c) => {
         const score = c.primaryGroup.matchScore;
+        if (score === null) return false; // Exclude null scores from match filters
         if (matchFilter === "90-100") return score >= 90;
         if (matchFilter === "80-89") return score >= 80 && score < 90;
         if (matchFilter === "70-79") return score >= 70 && score < 80;
@@ -224,7 +225,11 @@ export function DashboardPage() {
     }
 
     return filtered.sort(
-      (a, b) => b.primaryGroup.matchScore - a.primaryGroup.matchScore
+      (a, b) => {
+        const scoreA = a.primaryGroup.matchScore ?? -1;
+        const scoreB = b.primaryGroup.matchScore ?? -1;
+        return scoreB - scoreA;
+      }
     );
   }, [
     candidates,
@@ -383,6 +388,7 @@ export function DashboardPage() {
           candidate={selectedCandidate}
           onClose={() => setSelectedCandidate(null)}
           onStatusChange={handleCandidateStatusChange}
+          onRefresh={fetchCandidates}
         />
       )}
 

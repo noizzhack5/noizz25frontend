@@ -45,9 +45,10 @@ export function ExcitingNotification({ candidate, onClose, onViewDetails }: Exci
     return () => clearTimeout(timer);
   }, [onClose]);
 
+  const matchScore = candidate.primaryGroup.matchScore ?? 0;
   const matchData = [
-    { value: candidate.primaryGroup.matchScore, fill: '#F3CB06' },
-    { value: 100 - candidate.primaryGroup.matchScore, fill: '#F5F5F5' }
+    { value: matchScore, fill: '#F3CB06' },
+    { value: 100 - matchScore, fill: '#F5F5F5' }
   ];
 
   const getMatchLevel = (score: number) => {
@@ -57,7 +58,7 @@ export function ExcitingNotification({ candidate, onClose, onViewDetails }: Exci
     return { text: 'Needs Review', emoji: '📋' };
   };
 
-  const matchLevel = getMatchLevel(candidate.primaryGroup.matchScore);
+  const matchLevel = getMatchLevel(matchScore);
 
   return (
     <AnimatePresence>

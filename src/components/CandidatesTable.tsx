@@ -13,7 +13,10 @@ interface CandidatesTableProps {
   isSimplified?: boolean;
 }
 
-const getJobTypeLabel = (jobType: string) => {
+const getJobTypeLabel = (jobType: string | null | undefined): string | null => {
+  if (!jobType || jobType === 'null' || jobType === null) {
+    return null;
+  }
   const labels: Record<string, string> = {
     headquarters_staff: 'Headquarters Staff',
     training_instruction: 'Training/Instruction',
@@ -111,8 +114,10 @@ export function CandidatesTable({
     if (!a.isNew && b.isNew) return 1;
 
     if (!sortField || !sortDirection) {
-      // Default sort by match score descending
-      return b.primaryGroup.matchScore - a.primaryGroup.matchScore;
+      // Default sort by match score descending (null values go to end)
+      const scoreA = a.primaryGroup.matchScore ?? -1;
+      const scoreB = b.primaryGroup.matchScore ?? -1;
+      return scoreB - scoreA;
     }
 
     let comparison = 0;
@@ -126,12 +131,14 @@ export function CandidatesTable({
         comparison = statusOrder[a.status] - statusOrder[b.status];
         break;
       case 'jobType':
-        const jobTypeA = getJobTypeLabel(a.jobType);
-        const jobTypeB = getJobTypeLabel(b.jobType);
+        const jobTypeA = getJobTypeLabel(a.jobType) || '';
+        const jobTypeB = getJobTypeLabel(b.jobType) || '';
         comparison = jobTypeA.localeCompare(jobTypeB);
         break;
       case 'matchScore':
-        comparison = a.primaryGroup.matchScore - b.primaryGroup.matchScore;
+        const scoreA = a.primaryGroup.matchScore ?? -1;
+        const scoreB = b.primaryGroup.matchScore ?? -1;
+        comparison = scoreA - scoreB;
         break;
       case 'campaign':
         comparison = a.campaignSource.localeCompare(b.campaignSource);
@@ -284,7 +291,7 @@ export function CandidatesTable({
                     <StatusBadge status={candidate.status} />
                   </td>
                   <td className="px-6 py-4">
-                    {candidate.status !== 'submitted' ? (
+                    {candidate.status !== 'submitted' && candidate.jobType ? (
                       <span className="text-sm text-gray-700">
                         {getJobTypeLabel(candidate.jobType)}
                       </span>
@@ -293,7 +300,7 @@ export function CandidatesTable({
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {candidate.status !== 'submitted' ? (
+                    {candidate.status !== 'submitted' && candidate.primaryGroup.matchScore !== null ? (
                       <div className="flex items-center gap-3">
                         <svg width="80" height="50" viewBox="0 0 100 60" className="flex-shrink-0">
                           {/* Background semi-circle */}

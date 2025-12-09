@@ -20,9 +20,10 @@ const getJobTypeLabel = (jobType: string) => {
 };
 
 export function CandidateAddedModal({ candidate, onClose, onViewDetails }: CandidateAddedModalProps) {
+  const matchScore = candidate.primaryGroup.matchScore ?? 0;
   const matchData = [
-    { value: candidate.primaryGroup.matchScore, fill: '#F3CB06' },
-    { value: 100 - candidate.primaryGroup.matchScore, fill: '#F5F5F5' }
+    { value: matchScore, fill: '#F3CB06' },
+    { value: 100 - matchScore, fill: '#F5F5F5' }
   ];
 
   const getMatchLevel = (score: number) => {
@@ -32,7 +33,7 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
     return { text: 'Needs Review', color: '#EF4444', icon: '📋' };
   };
 
-  const matchLevel = getMatchLevel(candidate.primaryGroup.matchScore);
+  const matchLevel = getMatchLevel(matchScore);
 
   return (
     <div 
@@ -132,7 +133,7 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
                       <p className="text-2xl text-black">
-                        {candidate.primaryGroup.matchScore}
+                        {matchScore}
                       </p>
                       <p className="text-xs text-gray-500 -mt-1">%</p>
                     </div>
