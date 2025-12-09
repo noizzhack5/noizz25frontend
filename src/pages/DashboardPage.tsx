@@ -333,27 +333,45 @@ export function DashboardPage() {
         countriesFilter={countriesFilter}
       />
 
-      {/* Filter Bar */}
-      <FilterBar
-        statusFilter={statusFilter}
-        jobTypeFilter={jobTypeFilter}
-        matchFilter={matchFilter}
-        campaignFilter={campaignFilter}
-        onStatusFilterChange={setStatusFilter}
-        onJobTypeFilterChange={setJobTypeFilter}
-        onMatchFilterChange={setMatchFilter}
-        onCampaignFilterChange={setCampaignFilter}
-        availableCampaigns={availableCampaigns}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        countriesFilter={countriesFilter}
-        onCountriesFilterChange={setCountriesFilter}
-        availableCountries={availableCountries}
-      />
+      {/* Filter Bar and Table Header - Combined Sticky */}
+      <div className="sticky top-14 z-20 bg-white pt-4 -mt-4">
+        <FilterBar
+          statusFilter={statusFilter}
+          jobTypeFilter={jobTypeFilter}
+          matchFilter={matchFilter}
+          campaignFilter={campaignFilter}
+          onStatusFilterChange={setStatusFilter}
+          onJobTypeFilterChange={setJobTypeFilter}
+          onMatchFilterChange={setMatchFilter}
+          onCampaignFilterChange={setCampaignFilter}
+          availableCampaigns={availableCampaigns}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          countriesFilter={countriesFilter}
+          onCountriesFilterChange={setCountriesFilter}
+          availableCountries={availableCountries}
+        />
+        {/* Sticky Table Header */}
+        <div className="border border-gray-200 border-b-0 rounded-t-lg bg-gray-50">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Full Name</th>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Status</th>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Job Type</th>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Match Score</th>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Campaign</th>
+                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">CV</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
 
       {/* Candidates Table */}
       <CandidatesTable
         candidates={sortedCandidates}
+        hideHeader={true}
         onSelectCandidate={setSelectedCandidate}
         onDeleteCandidate={async (id) => {
           try {
