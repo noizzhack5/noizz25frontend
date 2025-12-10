@@ -202,3 +202,20 @@ html {
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+@keyframes rocket-lift {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-5deg);
+  }
+  100% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+}
+
+.animate-rocket-lift {
+  animation: rocket-lift 1.5s ease-in-out infinite;
+  transform-origin: center bottom;
+}

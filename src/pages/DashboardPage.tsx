@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useCandidatesStore } from "@/features/store/candidatesStore";
 import { ActionBoard } from "@/components/ActionBoard";
 import { SearchBar } from "@/components/SearchBar";
@@ -9,7 +9,9 @@ import { AddCandidateModal } from "@/components/AddCandidateModal";
 import { ExcitingNotification } from "@/components/ExcitingNotification";
 import { ResumeViewer } from "@/components/ResumeViewer";
 import { Toast } from "@/components/Toast";
+import { SyncIndicator } from "@/components/SyncIndicator";
 import { useUIStore } from "@/features/store/uiStore";
+import { usePolling } from "@/hooks/usePolling";
 import type { Candidate, Status, JobType } from "@/types";
 
 export function DashboardPage() {
@@ -24,8 +26,12 @@ export function DashboardPage() {
     countriesFilter,
     isLoading,
     error,
+    lastSyncedAt,
+    isSyncing,
     fetchCandidates,
     searchCandidates,
+    silentFetchCandidates,
+    silentSearchCandidates,
     setSelectedCandidate,
     setSearchQuery,
     setStatusFilter,
@@ -41,16 +47,33 @@ export function DashboardPage() {
 
   const { actionBoardVisible, toggleActionBoard, showAddCandidateModal, setShowAddCandidateModal } = useUIStore();
 
+  // Determine if we have active filters
+  const hasActiveFilters = 
+    searchQuery ||
+    statusFilter !== "all" ||
+    jobTypeFilter !== "all" ||
+    matchFilter !== "all" ||
+    campaignFilter !== "all" ||
+    countriesFilter.length > 0;
+
+  // Polling callback - uses silent methods to avoid loading flicker
+  const pollCandidates = useCallback(async () => {
+    if (hasActiveFilters) {
+      await silentSearchCandidates();
+    } else {
+      await silentFetchCandidates();
+    }
+  }, [hasActiveFilters, silentFetchCandidates, silentSearchCandidates]);
+
+  // Set up polling every 5 seconds
+  usePolling(pollCandidates, {
+    interval: 5000,
+    enabled: true,
+    pauseOnHidden: true,
+  });
+
   // Fetch candidates on mount and when filters change
   useEffect(() => {
-    const hasActiveFilters = 
-      searchQuery ||
-      statusFilter !== "all" ||
-      jobTypeFilter !== "all" ||
-      matchFilter !== "all" ||
-      campaignFilter !== "all" ||
-      countriesFilter.length > 0;
-
     if (hasActiveFilters) {
       searchCandidates();
     } else {
@@ -334,7 +357,11 @@ export function DashboardPage() {
       />
 
       {/* Filter Bar */}
-      <div className="sticky top-14 z-30 bg-white pt-4 -mt-4">
+      <div className="sticky top-14 z-30 bg-white pt-4 -mt-4 pb-4">
+        {/* Sync status indicator - subtle, top-right */}
+        <div className="flex justify-end mb-1">
+          <SyncIndicator lastSyncedAt={lastSyncedAt} isSyncing={isSyncing} />
+        </div>
         <FilterBar
           statusFilter={statusFilter}
           jobTypeFilter={jobTypeFilter}
@@ -356,7 +383,7 @@ export function DashboardPage() {
       {/* Candidates Table */}
       <CandidatesTable
         candidates={filteredCandidates}
-        stickyHeaderTop="124px"
+        stickyHeaderTop="148px"
         onSelectCandidate={setSelectedCandidate}
         onDeleteCandidate={async (id) => {
           try {

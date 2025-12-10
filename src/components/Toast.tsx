@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { CheckCircle, XCircle, Info } from 'lucide-react';
+import { CheckCircle, XCircle, Rocket } from 'lucide-react';
 
 interface ToastProps {
   message: string;
@@ -11,7 +11,7 @@ export function Toast({ message, type = 'info', onClose }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 4000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [onClose]);
@@ -19,7 +19,7 @@ export function Toast({ message, type = 'info', onClose }: ToastProps) {
   const icons = {
     success: <CheckCircle size={18} className="text-black" />,
     error: <XCircle size={18} className="text-red-600" />,
-    info: <Info size={18} className="text-black" />
+    info: <Rocket size={18} className="text-black animate-rocket-lift" />
   };
 
   const backgrounds = {

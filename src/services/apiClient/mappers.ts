@@ -62,6 +62,7 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     // Server format (capitalized)
     "Headquarters Staff": "headquarters_staff",
     "Headquarters": "headquarters_staff",
+    "HQ": "headquarters_staff",
     "Training/Instruction": "training_instruction",
     "Training": "training_instruction",
     "Instruction": "training_instruction",

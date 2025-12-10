@@ -23,10 +23,17 @@ interface CandidatesState {
   isLoading: boolean;
   error: string | null;
   
+  // Polling state
+  lastSyncedAt: Date | null;
+  isSyncing: boolean;
+  
   // Actions
   fetchCandidates: () => Promise<void>;
   fetchDeletedCandidates: () => Promise<void>;
   searchCandidates: () => Promise<void>;
+  silentFetchCandidates: () => Promise<boolean>; // Returns true if data changed
+  silentSearchCandidates: () => Promise<boolean>; // Returns true if data changed
+  silentFetchDeletedCandidates: () => Promise<boolean>; // Returns true if data changed
   setCandidates: (candidates: Candidate[]) => void;
   addCandidate: (candidate: Omit<Candidate, "id">, file?: File) => Promise<import("@/services/apiClient/types").CVUploadResponse>;
   updateCandidate: (id: string, updates: Partial<Candidate>) => Promise<void>;
@@ -57,6 +64,48 @@ const initialState = {
   view: "home" as "home" | "deleted",
   isLoading: false,
   error: null,
+  lastSyncedAt: null as Date | null,
+  isSyncing: false,
+};
+
+// Helper to create a fingerprint of candidate data for comparison
+// This helps us detect actual changes without deep comparison
+const getCandidateFingerprint = (candidate: Candidate): string => {
+  return JSON.stringify({
+    id: candidate.id,
+    fullName: candidate.fullName,
+    email: candidate.email,
+    phone: candidate.phone,
+    status: candidate.status,
+    jobType: candidate.jobType,
+    primaryGroup: candidate.primaryGroup,
+    alternativeGroups: candidate.alternativeGroups,
+    matchedParameters: candidate.matchedParameters,
+    aiSkillsSummary: candidate.aiSkillsSummary,
+    notes: candidate.notes,
+    manualNotes: candidate.manualNotes,
+    deleted: candidate.deleted,
+    warnings: candidate.warnings,
+    botConversation: candidate.botConversation,
+  });
+};
+
+// Compare two candidate arrays and return true if they are different
+const hasCandidatesChanged = (
+  oldCandidates: Candidate[],
+  newCandidates: Candidate[]
+): boolean => {
+  if (oldCandidates.length !== newCandidates.length) return true;
+  
+  const oldMap = new Map(oldCandidates.map(c => [c.id, getCandidateFingerprint(c)]));
+  
+  for (const newCandidate of newCandidates) {
+    const oldFingerprint = oldMap.get(newCandidate.id);
+    if (!oldFingerprint) return true; // New candidate added
+    if (oldFingerprint !== getCandidateFingerprint(newCandidate)) return true; // Candidate changed
+  }
+  
+  return false;
 };
 
 export const useCandidatesStore = create<CandidatesState>((set, get) => ({
@@ -86,7 +135,8 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
       set({ 
         candidates, 
         selectedCandidate: updatedSelectedCandidate,
-        isLoading: false 
+        isLoading: false,
+        lastSyncedAt: new Date(),
       });
     } catch (error) {
       const message =
@@ -110,7 +160,8 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
       set({ 
         candidates, 
         selectedCandidate: updatedSelectedCandidate,
-        isLoading: false 
+        isLoading: false,
+        lastSyncedAt: new Date(),
       });
     } catch (error) {
       const message =
@@ -157,7 +208,8 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
       set({ 
         candidates, 
         selectedCandidate: updatedSelectedCandidate,
-        isLoading: false 
+        isLoading: false,
+        lastSyncedAt: new Date(),
       });
     } catch (error) {
       const message =
@@ -166,6 +218,160 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
           : "Failed to search candidates";
       set({ error: message, isLoading: false });
       console.error("Error searching candidates:", error);
+    }
+  },
+
+  // Silent fetch for polling - doesn't trigger loading state
+  silentFetchCandidates: async () => {
+    const state = get();
+    set({ isSyncing: true });
+    
+    try {
+      const docs = await apiClient.getAllCVs(false);
+      const newCandidates = docs.map(mapCVDocumentToCandidate);
+      
+      // Check if data has actually changed
+      if (!hasCandidatesChanged(state.candidates, newCandidates)) {
+        set({ isSyncing: false, lastSyncedAt: new Date() });
+        return false;
+      }
+      
+      // Preserve isNew flags from existing candidates
+      const existingNewFlags = new Map(
+        state.candidates.filter(c => c.isNew).map(c => [c.id, true])
+      );
+      
+      // Preserve statusChangedAt and newAnswersAt flags
+      const existingStatusChangedAt = new Map(
+        state.candidates.filter(c => c.statusChangedAt).map(c => [c.id, c.statusChangedAt])
+      );
+      const existingNewAnswersAt = new Map(
+        state.candidates.filter(c => c.newAnswersAt).map(c => [c.id, c.newAnswersAt])
+      );
+      
+      const candidates = newCandidates.map(c => ({
+        ...c,
+        isNew: existingNewFlags.get(c.id) || false,
+        statusChangedAt: existingStatusChangedAt.get(c.id),
+        newAnswersAt: existingNewAnswersAt.get(c.id),
+      }));
+      
+      const currentSelectedId = state.selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? candidates.find(c => c.id === currentSelectedId) || null
+        : null;
+      
+      set({ 
+        candidates, 
+        selectedCandidate: updatedSelectedCandidate,
+        isSyncing: false,
+        lastSyncedAt: new Date(),
+      });
+      return true;
+    } catch (error) {
+      // Silently fail for background polling
+      console.error("Silent fetch error:", error);
+      set({ isSyncing: false });
+      return false;
+    }
+  },
+
+  // Silent search for polling with active filters
+  silentSearchCandidates: async () => {
+    const state = get();
+    set({ isSyncing: true });
+    
+    try {
+      const searchParams: import("@/services/apiClient/types").CVSearchParams = {
+        free_text: state.searchQuery || null,
+        current_status: state.statusFilter !== "all" ? mapStatusToStatusString(state.statusFilter) : null,
+        job_type: state.jobTypeFilter !== "all" ? state.jobTypeFilter : null,
+        match_score: state.matchFilter !== "all" ? (state.matchFilter as any) : null,
+        campaign: state.campaignFilter !== "all" ? state.campaignFilter : null,
+        country: state.countriesFilter.length > 0 ? state.countriesFilter[0] : null,
+      };
+
+      const docs = await apiClient.searchCVs(searchParams);
+      const newCandidates = docs.map(mapCVDocumentToCandidate);
+      
+      // Check if data has actually changed
+      if (!hasCandidatesChanged(state.candidates, newCandidates)) {
+        set({ isSyncing: false, lastSyncedAt: new Date() });
+        return false;
+      }
+      
+      // Preserve isNew flags from existing candidates
+      const existingNewFlags = new Map(
+        state.candidates.filter(c => c.isNew).map(c => [c.id, true])
+      );
+      
+      // Preserve statusChangedAt and newAnswersAt flags
+      const existingStatusChangedAt = new Map(
+        state.candidates.filter(c => c.statusChangedAt).map(c => [c.id, c.statusChangedAt])
+      );
+      const existingNewAnswersAt = new Map(
+        state.candidates.filter(c => c.newAnswersAt).map(c => [c.id, c.newAnswersAt])
+      );
+      
+      const candidates = newCandidates.map(c => ({
+        ...c,
+        isNew: existingNewFlags.get(c.id) || false,
+        statusChangedAt: existingStatusChangedAt.get(c.id),
+        newAnswersAt: existingNewAnswersAt.get(c.id),
+      }));
+      
+      const currentSelectedId = state.selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? candidates.find(c => c.id === currentSelectedId) || null
+        : null;
+      
+      set({ 
+        candidates, 
+        selectedCandidate: updatedSelectedCandidate,
+        isSyncing: false,
+        lastSyncedAt: new Date(),
+      });
+      return true;
+    } catch (error) {
+      // Silently fail for background polling
+      console.error("Silent search error:", error);
+      set({ isSyncing: false });
+      return false;
+    }
+  },
+
+  // Silent fetch for deleted candidates polling
+  silentFetchDeletedCandidates: async () => {
+    const state = get();
+    set({ isSyncing: true });
+    
+    try {
+      const docs = await apiClient.getAllCVs(true);
+      const newCandidates = docs.map(mapCVDocumentToCandidate);
+      
+      // Check if data has actually changed
+      if (!hasCandidatesChanged(state.candidates, newCandidates)) {
+        set({ isSyncing: false, lastSyncedAt: new Date() });
+        return false;
+      }
+      
+      const currentSelectedId = state.selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? newCandidates.find(c => c.id === currentSelectedId) || null
+        : null;
+      
+      set({ 
+        candidates: newCandidates, 
+        selectedCandidate: updatedSelectedCandidate,
+        isSyncing: false,
+        lastSyncedAt: new Date(),
+      });
+      return true;
+    } catch (error) {
+      // Silently fail for background polling
+      console.error("Silent fetch deleted error:", error);
+      set({ isSyncing: false });
+      return false;
     }
   },
 
