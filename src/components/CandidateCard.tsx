@@ -13,7 +13,8 @@ interface CandidateCardProps {
   onRefresh?: () => void; // Optional callback to refresh the candidates list
 }
 
-const getJobTypeLabel = (jobType: string) => {
+const getJobTypeLabel = (jobType: string | null | undefined) => {
+  if (!jobType) return '';
   const labels: Record<string, string> = {
     headquarters_staff: 'Headquarters Staff',
     training_instruction: 'Training/Instruction',
@@ -23,9 +24,48 @@ const getJobTypeLabel = (jobType: string) => {
   return labels[jobType] || jobType;
 };
 
-// Generate a consistent random avatar URL based on candidate ID
-const getRandomAvatarUrl = (candidateId: string, size: number = 200) => {
-  return `https://i.pravatar.cc/${size}?u=${candidateId}`;
+// Get initials from full name (e.g., "LENA ARO" -> "LA")
+const getInitials = (name: string): string => {
+  if (!name) return '';
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .filter(Boolean)
+    .join('')
+    .toUpperCase()
+    .slice(0, 2); // Take first 2 letters
+};
+
+// Generate a consistent, beautiful color for avatar based on ID or name
+const getAvatarColor = (id: string, name: string): { bg: string; text: string } => {
+  const str = `${id}-${name}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  // Beautiful, modern color palette with good contrast
+  const colors = [
+    { bg: '#6366F1', text: '#FFFFFF' }, // Indigo
+    { bg: '#8B5CF6', text: '#FFFFFF' }, // Purple
+    { bg: '#EC4899', text: '#FFFFFF' }, // Pink
+    { bg: '#EF4444', text: '#FFFFFF' }, // Red
+    { bg: '#F59E0B', text: '#FFFFFF' }, // Amber
+    { bg: '#10B981', text: '#FFFFFF' }, // Emerald
+    { bg: '#06B6D4', text: '#FFFFFF' }, // Cyan
+    { bg: '#3B82F6', text: '#FFFFFF' }, // Blue
+    { bg: '#14B8A6', text: '#FFFFFF' }, // Teal
+    { bg: '#F97316', text: '#FFFFFF' }, // Orange
+    { bg: '#84CC16', text: '#FFFFFF' }, // Lime
+    { bg: '#A855F7', text: '#FFFFFF' }, // Violet
+    { bg: '#E11D48', text: '#FFFFFF' }, // Rose
+    { bg: '#0EA5E9', text: '#FFFFFF' }, // Sky
+    { bg: '#22C55E', text: '#FFFFFF' }, // Green
+    { bg: '#F43F5E', text: '#FFFFFF' }, // Rose 2
+  ];
+  
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
 };
 
 const getJobTypeParameters = (jobType: string): string[] => {
@@ -219,23 +259,31 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
           <div className="flex items-center gap-4">
             <StatusBadge status={candidate.status} />
             
-            {isScrolled && (
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <img 
-                    src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 80)} 
-                    alt={candidate.fullName} 
-                    className="w-full h-full object-cover" 
-                  />
+            {isScrolled && (() => {
+              const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
+              return (
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
+                    style={{ 
+                      backgroundColor: avatarColor.bg, 
+                      color: avatarColor.text,
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                      opacity: 0.5,
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+                    }}
+                  >
+                    {getInitials(candidate.fullName)}
+                  </div>
+                  <div>
+                    <p className="text-sm text-black">{candidate.fullName}</p>
+                    {candidate.fullNameHebrew && (
+                      <p className="text-xs text-gray-500" style={{ fontFamily: 'Arial, sans-serif' }}>{candidate.fullNameHebrew}</p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-black">{candidate.fullName}</p>
-                  {candidate.fullNameHebrew && (
-                    <p className="text-xs text-gray-500" style={{ fontFamily: 'Arial, sans-serif' }}>{candidate.fullNameHebrew}</p>
-                  )}
-                </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           {/* Right side - Action buttons */}
@@ -288,13 +336,23 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
       <div className="px-12 py-6 space-y-6">
         {/* SECTION 1 - CANDIDATE PROFILE (Always visible) */}
         <div className="flex flex-col items-center space-y-1">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center overflow-hidden">
-            <img 
-              src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 200)} 
-              alt={candidate.fullName} 
-              className="w-full h-full object-cover" 
-            />
-          </div>
+          {(() => {
+            const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
+            return (
+              <div 
+                className="w-24 h-24 rounded-full flex items-center justify-center font-bold text-2xl"
+                style={{ 
+                  backgroundColor: avatarColor.bg, 
+                  color: avatarColor.text,
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                  opacity: 0.5,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                }}
+              >
+                {getInitials(candidate.fullName)}
+              </div>
+            );
+          })()}
           <div className="text-center">
             <h2 className="text-black mb-0 font-medium">{candidate.fullName}</h2>
             {candidate.fullNameHebrew && (
@@ -376,7 +434,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
             <div className="border-t border-gray-200"></div>
 
             {/* Bottom Section: Job Type & Match Score */}
-            {candidate.status === 'submitted' ? (
+            {candidate.status !== 'ready_for_recruit' ? (
               <div className="flex items-center justify-center">
                 <div className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-lg">
                   <Brain size={18} className="text-gray-400" />
@@ -617,15 +675,17 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
             </div>
 
             {/* AI-Identified Skills */}
-            <div className="pt-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Brain size={16} className="text-gray-400" />
-                <h4 className="text-xs text-gray-500">AI-Identified Skills</h4>
+            {candidate.status !== 'submitted' && (
+              <div className="pt-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Brain size={16} className="text-gray-400" />
+                  <h4 className="text-xs text-gray-500">AI-Identified Skills</h4>
+                </div>
+                <p className="text-sm text-gray-900 leading-relaxed">
+                  {candidate.aiSkillsSummary}
+                </p>
               </div>
-              <p className="text-sm text-gray-900 leading-relaxed">
-                {candidate.aiSkillsSummary}
-              </p>
-            </div>
+            )}
           </div>
         </CollapsibleSection>
 
@@ -691,6 +751,12 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                 onClick={async () => {
                   setIsStartingBot(true);
                   setBotError(null);
+                  
+                  // Close modal after 2 seconds
+                  const closeTimer = setTimeout(() => {
+                    setShowBotConfirmation(false);
+                  }, 2000);
+                  
                   try {
                     // Call the API to trigger bot processor with candidate ID
                     // The server will handle status updates - client should not update status
@@ -700,6 +766,8 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                       onRefresh();
                     }
                     setConversationStarted(true);
+                    // Clear the timer if we close manually before 2 seconds
+                    clearTimeout(closeTimer);
                     setShowBotConfirmation(false);
                   } catch (error) {
                     const message = error instanceof ApiError 
@@ -707,6 +775,8 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                       : 'Failed to start bot conversation';
                     setBotError(message);
                     console.error('Error starting bot conversation:', error);
+                    // Clear the timer on error so modal stays open to show error
+                    clearTimeout(closeTimer);
                   } finally {
                     setIsStartingBot(false);
                   }

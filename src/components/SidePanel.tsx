@@ -43,6 +43,36 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
       .toUpperCase();
   };
 
+  const getAvatarColor = (id: string, name: string): { bg: string; text: string } => {
+    const str = `${id}-${name}`;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    
+    const colors = [
+      { bg: '#6366F1', text: '#FFFFFF' },
+      { bg: '#8B5CF6', text: '#FFFFFF' },
+      { bg: '#EC4899', text: '#FFFFFF' },
+      { bg: '#EF4444', text: '#FFFFFF' },
+      { bg: '#F59E0B', text: '#FFFFFF' },
+      { bg: '#10B981', text: '#FFFFFF' },
+      { bg: '#06B6D4', text: '#FFFFFF' },
+      { bg: '#3B82F6', text: '#FFFFFF' },
+      { bg: '#14B8A6', text: '#FFFFFF' },
+      { bg: '#F97316', text: '#FFFFFF' },
+      { bg: '#84CC16', text: '#FFFFFF' },
+      { bg: '#A855F7', text: '#FFFFFF' },
+      { bg: '#E11D48', text: '#FFFFFF' },
+      { bg: '#0EA5E9', text: '#FFFFFF' },
+      { bg: '#22C55E', text: '#FFFFFF' },
+      { bg: '#F43F5E', text: '#FFFFFF' },
+    ];
+    
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -64,17 +94,23 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-start justify-between">
           <div className="flex items-start gap-4">
-            {candidate.profileImage ? (
-              <img
-                src={candidate.profileImage}
-                alt={candidate.fullName}
-                className="w-16 h-16 object-cover"
-              />
-            ) : (
-              <div className="w-16 h-16 bg-gray-200 flex items-center justify-center text-gray-600">
-                {getInitials(candidate.fullName)}
-              </div>
-            )}
+            {(() => {
+              const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
+              return (
+                <div 
+                  className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl"
+                  style={{ 
+                    backgroundColor: avatarColor.bg, 
+                    color: avatarColor.text,
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                    opacity: 0.5,
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  }}
+                >
+                  {getInitials(candidate.fullName)}
+                </div>
+              );
+            })()}
             <div>
               <h2 className="text-black mb-2">{candidate.fullName}</h2>
               <div className="flex flex-col gap-1">

@@ -9,10 +9,6 @@ interface ChatbotPreviewModalProps {
   onClose: () => void;
 }
 
-// Generate a consistent random avatar URL based on candidate ID
-const getRandomAvatarUrl = (candidateId: string, size: number = 200) => {
-  return `https://i.pravatar.cc/${size}?u=${candidateId}`;
-};
 
 export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -69,13 +65,23 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
         {/* Header - WhatsApp style */}
         <div className="bg-[#075E54] text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
-              <img 
-                src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 80)} 
-                alt={candidate.fullName} 
-                className="w-full h-full object-cover" 
-              />
-            </div>
+            {(() => {
+              const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
+              return (
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
+                  style={{ 
+                    backgroundColor: avatarColor.bg, 
+                    color: avatarColor.text,
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
+                    opacity: 0.5,
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+                  }}
+                >
+                  {getInitials(candidate.fullName)}
+                </div>
+              );
+            })()}
             <div>
               <p className="font-medium">{candidate.fullName}</p>
               <p className="text-xs text-white/80">WhatsApp Conversation</p>
