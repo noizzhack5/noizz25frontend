@@ -363,7 +363,7 @@ export function CandidatesTable({
                           <path
                             d="M 10 55 A 40 40 0 0 1 90 55"
                             fill="none"
-                            stroke="#F3CB06"
+                            stroke="black"
                             strokeWidth="4"
                             strokeLinecap="round"
                             strokeDasharray={`${(candidate.primaryGroup.matchScore / 100) * 126} 126`}
