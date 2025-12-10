@@ -87,28 +87,32 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     ? parseFloat(knownData.match_score)
     : null;
 
+  // Helper to map string boolean values, returning null for missing/empty
+  const mapBooleanField = (value: string | undefined | null): boolean | null => {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+    const lower = value.toLowerCase();
+    if (lower === 'yes' || lower === 'true') {
+      return true;
+    }
+    if (lower === 'no' || lower === 'false') {
+      return false;
+    }
+    return null; // Unknown value
+  };
+
   // Map boolean fields from known_data
-  const canTravelEurope =
-    knownData.can_travel_europe?.toLowerCase() === "yes" ||
-    knownData.can_travel_europe?.toLowerCase() === "true";
-  const canTravelIsrael =
-    knownData.can_visit_israel?.toLowerCase() === "yes" ||
-    knownData.can_visit_israel?.toLowerCase() === "true";
-  const livesInEurope =
-    knownData.lives_in_europe?.toLowerCase() === "yes" ||
-    knownData.lives_in_europe?.toLowerCase() === "true";
-  const nativeIsraeli =
-    knownData.native_israeli?.toLowerCase() === "yes" ||
-    knownData.native_israeli?.toLowerCase() === "true";
-  const speaksEnglish =
-    knownData.english_level && 
+  const canTravelEurope = mapBooleanField(knownData.can_travel_europe);
+  const canTravelIsrael = mapBooleanField(knownData.can_visit_israel);
+  const livesInEurope = mapBooleanField(knownData.lives_in_europe);
+  const nativeIsraeli = mapBooleanField(knownData.native_israeli);
+  const speaksEnglish = knownData.english_level && 
     knownData.english_level.toLowerCase() !== "none" &&
     knownData.english_level.toLowerCase() !== "" 
     ? true 
-    : false;
-  const remembersPosition =
-    knownData.remembers_job_application?.toLowerCase() === "yes" ||
-    knownData.remembers_job_application?.toLowerCase() === "true";
+    : null;
+  const remembersPosition = mapBooleanField(knownData.remembers_job_application);
 
   // Get created_at from file_metadata if available
   const createdAt = doc.file_metadata?.uploaded_at 

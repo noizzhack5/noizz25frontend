@@ -68,8 +68,8 @@ const getStatusColor = (status: string) => {
   return colors[status] || '#6B7280';
 };
 
-const YesNoField = ({ value }: { value?: boolean }) => {
-  if (value === undefined) {
+const YesNoField = ({ value }: { value?: boolean | null | string }) => {
+  if (value === undefined || value === null || value === '') {
     return <span className="text-red-500">Missing</span>;
   }
   return (
@@ -79,12 +79,13 @@ const YesNoField = ({ value }: { value?: boolean }) => {
   );
 };
 
-const DataField = ({ label, value, missing }: { label: string; value?: string | number; missing?: boolean }) => {
+const DataField = ({ label, value, missing }: { label: string; value?: string | number | null; missing?: boolean }) => {
+  const isMissing = missing || value === undefined || value === null || value === '';
   return (
     <div>
       <p className="text-sm text-gray-500 mb-1">{label}</p>
-      {missing ? (
-        <span className="text-red-400 text-sm">Missing</span>
+      {isMissing ? (
+        <span className="text-red-500 text-sm">Missing</span>
       ) : (
         <span className="text-gray-900">{value}</span>
       )}
@@ -317,11 +318,19 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                 <div className="space-y-2 pl-6">
                   <div className="flex items-center gap-3">
                     <p className="text-xs text-gray-400 min-w-[70px]">Age</p>
-                    <p className="text-sm text-black">{candidate.age ? `${candidate.age} years` : 'Not specified'}</p>
+                    {candidate.age ? (
+                      <p className="text-sm text-black">{candidate.age} years</p>
+                    ) : (
+                      <p className="text-sm text-red-500">Missing</p>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-xs text-gray-400 min-w-[70px]">Citizenship</p>
-                    <p className="text-sm text-black">{candidate.citizenship || 'Not specified'}</p>
+                    {candidate.citizenship ? (
+                      <p className="text-sm text-black">{candidate.citizenship}</p>
+                    ) : (
+                      <p className="text-sm text-red-500">Missing</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -335,21 +344,29 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                 <div className="space-y-2 pl-6">
                   <div className="flex items-center gap-3">
                     <Phone size={14} className="text-gray-400" />
-                    <a 
-                      href={`tel:${candidate.phone}`}
-                      className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
-                    >
-                      {candidate.phone || 'Not available'}
-                    </a>
+                    {candidate.phone ? (
+                      <a 
+                        href={`tel:${candidate.phone}`}
+                        className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        {candidate.phone}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-red-500">Missing</span>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail size={14} className="text-gray-400" />
-                    <a 
-                      href={`mailto:${candidate.email}`}
-                      className="text-sm text-blue-600 hover:text-blue-700 transition-colors break-all"
-                    >
-                      {candidate.email}
-                    </a>
+                    {candidate.email ? (
+                      <a 
+                        href={`mailto:${candidate.email}`}
+                        className="text-sm text-blue-600 hover:text-blue-700 transition-colors break-all"
+                      >
+                        {candidate.email}
+                      </a>
+                    ) : (
+                      <span className="text-sm text-red-500">Missing</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -760,11 +777,19 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-500 mb-1">Age</p>
-                      <p className="text-gray-900">{candidate.age || 'Not specified'}</p>
+                      {candidate.age ? (
+                        <p className="text-gray-900">{candidate.age}</p>
+                      ) : (
+                        <p className="text-red-500">Missing</p>
+                      )}
                     </div>
                     <div>
                       <p className="text-gray-500 mb-1">Citizenship</p>
-                      <p className="text-gray-900">{candidate.citizenship || 'Not specified'}</p>
+                      {candidate.citizenship ? (
+                        <p className="text-gray-900">{candidate.citizenship}</p>
+                      ) : (
+                        <p className="text-red-500">Missing</p>
+                      )}
                     </div>
                   </div>
                 </div>

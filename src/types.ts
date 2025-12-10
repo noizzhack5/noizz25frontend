@@ -62,12 +62,12 @@ export interface Candidate {
   deletedAt?: Date;
   
   // New fields
-  canTravelEurope?: boolean;
-  canTravelIsrael?: boolean;
-  livesInEurope?: boolean;
-  nativeIsraeli?: boolean;
-  speaksEnglish?: boolean;
-  remembersPosition?: boolean;
+  canTravelEurope?: boolean | null;
+  canTravelIsrael?: boolean | null;
+  livesInEurope?: boolean | null;
+  nativeIsraeli?: boolean | null;
+  speaksEnglish?: boolean | null;
+  remembersPosition?: boolean | null;
   
   // Tracking fields for indicators
   isNew?: boolean;

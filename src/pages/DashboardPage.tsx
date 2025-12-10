@@ -69,6 +69,19 @@ export function DashboardPage() {
     type: "success" | "error" | "info";
   } | null>(null);
 
+  const getJobTypeLabel = (jobType: string | null | undefined): string | null => {
+    if (!jobType || jobType === 'null' || jobType === null) {
+      return null;
+    }
+    const labels: Record<string, string> = {
+      headquarters_staff: 'Headquarters Staff',
+      training_instruction: 'Training/Instruction',
+      sales: 'Sales',
+      operational_worker: 'Operational Worker'
+    };
+    return labels[jobType] || jobType;
+  };
+
   // Get unique campaigns for filter
   const availableCampaigns = useMemo(() => {
     return Array.from(
@@ -224,13 +237,7 @@ export function DashboardPage() {
       });
     }
 
-    return filtered.sort(
-      (a, b) => {
-        const scoreA = a.primaryGroup.matchScore ?? -1;
-        const scoreB = b.primaryGroup.matchScore ?? -1;
-        return scoreB - scoreA;
-      }
-    );
+    return filtered;
   }, [
     candidates,
     searchQuery,
@@ -241,11 +248,6 @@ export function DashboardPage() {
     countriesFilter,
   ]);
 
-  const sortedCandidates = useMemo(() => {
-    const newCandidates = filteredCandidates.filter((c) => c.isNew);
-    const existingCandidates = filteredCandidates.filter((c) => !c.isNew);
-    return [...newCandidates, ...existingCandidates];
-  }, [filteredCandidates]);
 
   const handleUpdateCandidate = async (updatedCandidate: Candidate) => {
     try {
@@ -332,7 +334,7 @@ export function DashboardPage() {
         countriesFilter={countriesFilter}
       />
 
-      {/* Filter Bar and Table Header - Combined Sticky */}
+      {/* Filter Bar */}
       <div className="sticky top-14 z-20 bg-white pt-4 -mt-4">
         <FilterBar
           statusFilter={statusFilter}
@@ -350,27 +352,12 @@ export function DashboardPage() {
           onCountriesFilterChange={setCountriesFilter}
           availableCountries={availableCountries}
         />
-        {/* Sticky Table Header */}
-        <div className="border border-gray-200 border-b-0 rounded-t-lg bg-gray-50">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Full Name</th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Status</th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Job Type</th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Match Score</th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">Campaign</th>
-                <th className="px-6 py-4 text-left text-sm text-gray-600 font-normal">CV</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
       </div>
 
       {/* Candidates Table */}
       <CandidatesTable
-        candidates={sortedCandidates}
-        hideHeader={true}
+        candidates={filteredCandidates}
+        stickyHeaderTop="124px"
         onSelectCandidate={setSelectedCandidate}
         onDeleteCandidate={async (id) => {
           try {
