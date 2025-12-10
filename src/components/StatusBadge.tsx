@@ -31,7 +31,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   };
 
   return (
-    <span className={`inline-block px-3 py-1 text-sm rounded-full ${config.className}`}>
+    <span className={`inline-block px-3 py-1 text-sm rounded-full whitespace-nowrap ${config.className}`}>
       {config.label}
     </span>
   );

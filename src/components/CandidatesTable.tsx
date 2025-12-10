@@ -386,9 +386,11 @@ export function CandidatesTable({
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="inline-block px-3 py-1 bg-gray-100 text-sm text-gray-700">
-                      {candidate.campaignSource}
-                    </span>
+                    {candidate.campaignSource ? (
+                      <span className="inline-block px-3 py-1 bg-gray-100 text-sm text-gray-700 whitespace-nowrap">
+                        {candidate.campaignSource}
+                      </span>
+                    ) : null}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-between">

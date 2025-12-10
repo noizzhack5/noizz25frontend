@@ -128,9 +128,9 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
     <div>
       {isVisible && (
         <div className="bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 py-6 mb-6">
-          <div className="flex flex-wrap items-start gap-6 md:gap-12 lg:gap-20 xl:gap-[110px] gap-y-6 overflow-x-auto">
+          <div className="flex flex-nowrap items-start gap-8 md:gap-12 lg:gap-16 xl:gap-20 overflow-x-auto scrollbar-hide">
             {/* 1. Total Candidates */}
-            <div className="flex-shrink-0 flex flex-col items-start">
+            <div className="flex-shrink-0 flex flex-col items-start min-w-[280px]">
               <p className="text-xs text-gray-400 mb-2">Total Candidates</p>
               <div className="flex items-center gap-4">
                 <p className="text-2xl text-black">{totalCount}</p>
@@ -191,7 +191,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                     </PieChart>
                   </ResponsiveContainer>
                 </button>
-                <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                   <button 
                     onClick={() => {
                       if (statusFilter === 'submitted') {
@@ -265,7 +265,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
 
             {/* 2. Top 3 Countries */}
             {topCountries.length > 0 && (
-              <div className="flex-shrink-0 flex flex-col items-start" style={{ width: '220px' }}>
+              <div className="flex-shrink-0 flex flex-col items-start min-w-[220px]">
                 <p className="text-xs text-gray-400 mb-2">Top 3 Countries (Ready)</p>
                 <div className="flex items-start gap-3 w-full">
                   <div className="flex flex-col gap-1.5 w-full">
@@ -305,7 +305,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
             )}
 
             {/* 3. Match Score Distribution */}
-            <div className="flex-shrink-0 flex flex-col items-start" style={{ width: '140px' }}>
+            <div className="flex-shrink-0 flex flex-col items-start min-w-[140px]">
               <p className="text-xs text-gray-400 mb-2">Match Score Distribution</p>
               <div className="flex items-start gap-4">
                 <div 
@@ -376,7 +376,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
 
             {/* 4. Leading Campaign */}
             {leadingCampaign && (
-              <div className="flex-shrink-0 flex flex-col items-start" style={{ width: '200px' }}>
+              <div className="flex-shrink-0 flex flex-col items-start min-w-[200px]">
                 <p className="text-xs text-gray-400 mb-2">Leading Campaign</p>
                 <div className="flex items-center gap-2">
                   <Trophy size={18} className="text-[#F3CB06]" />
