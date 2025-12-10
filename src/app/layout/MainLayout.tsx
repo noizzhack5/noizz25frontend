@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
+import { Toast } from "@/components/Toast";
 import { useCandidatesStore } from "@/features/store/candidatesStore";
 import { useUIStore } from "@/features/store/uiStore";
 import type { Candidate } from "@/types";
 
 export function MainLayout() {
   const { addCandidate, clearFilters } = useCandidatesStore();
-  const { actionBoardVisible, toggleActionBoard, setShowAddCandidateModal } = useUIStore();
+  const { actionBoardVisible, toggleActionBoard, setShowAddCandidateModal, toast, showToast, setToast } = useUIStore();
 
   const handleLogoClick = () => {
     clearFilters();
@@ -99,7 +100,7 @@ export function MainLayout() {
       <Header
         onAddCandidate={() => setShowAddCandidateModal(true)}
         onImportExcel={() => {
-          // TODO: Implement Excel import
+          showToast("Feature coming soon", "info");
         }}
         showActionBoard={actionBoardVisible}
         onToggleActionBoard={toggleActionBoard}
@@ -109,6 +110,15 @@ export function MainLayout() {
       <div className="pt-14 lg:pl-[72px]">
         <Outlet />
       </div>
+      
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }
