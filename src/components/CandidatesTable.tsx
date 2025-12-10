@@ -268,17 +268,21 @@ export function CandidatesTable({
       {/* Sticky Header */}
       {!hideHeader && stickyHeaderTop && (
         <div 
-          className="sticky z-20 border border-gray-200 border-b-0 rounded-t-lg bg-gray-50"
-          style={{ 
-            top: stickyHeaderTop,
-            boxShadow: '0 -20px 0 20px white'
-          }}
+          className="sticky z-20"
+          style={{ top: stickyHeaderTop }}
         >
-          <table className="w-full table-fixed border-collapse">
-            <thead>
-              {renderHeaderRow()}
-            </thead>
-          </table>
+          {/* White cover above header to hide scrolling rows in the gap */}
+          <div 
+            className="absolute left-0 right-0 bg-white"
+            style={{ top: '-20px', height: '20px' }}
+          />
+          <div className="relative border border-gray-200 border-b-0 rounded-t-lg bg-gray-50">
+            <table className="w-full table-fixed border-collapse">
+              <thead>
+                {renderHeaderRow()}
+              </thead>
+            </table>
+          </div>
         </div>
       )}
 
@@ -363,7 +367,7 @@ export function CandidatesTable({
                           <path
                             d="M 10 55 A 40 40 0 0 1 90 55"
                             fill="none"
-                            stroke="#F3CB06"
+                            stroke="black"
                             strokeWidth="4"
                             strokeLinecap="round"
                             strokeDasharray={`${(candidate.primaryGroup.matchScore / 100) * 126} 126`}
