@@ -1,12 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useCandidatesStore } from "@/features/store/candidatesStore";
+import { SyncIndicator } from "@/components/SyncIndicator";
+import { usePolling } from "@/hooks/usePolling";
 
 export function DeletedCandidatesPage() {
   const {
     candidates,
     searchQuery,
     error,
+    lastSyncedAt,
+    isSyncing,
     fetchDeletedCandidates,
+    silentFetchDeletedCandidates,
     setSearchQuery,
     restoreCandidate,
   } = useCandidatesStore();
@@ -15,6 +20,18 @@ export function DeletedCandidatesPage() {
     fetchDeletedCandidates();
   }, []);
 
+  // Polling callback - uses silent method to avoid loading flicker
+  const pollDeletedCandidates = useCallback(async () => {
+    await silentFetchDeletedCandidates();
+  }, [silentFetchDeletedCandidates]);
+
+  // Set up polling every 5 seconds
+  usePolling(pollDeletedCandidates, {
+    interval: 5000,
+    enabled: true,
+    pauseOnHidden: true,
+  });
+
   const filteredCandidates = candidates.filter(
     (c) => c.deleted && (!searchQuery || c.fullName.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -22,10 +39,15 @@ export function DeletedCandidatesPage() {
   return (
     <div className="px-4 md:px-6 lg:px-8 py-4 md:py-6">
       <div className="mb-6">
-        <h2 className="text-black mb-2">Deleted Candidates</h2>
-        <p className="text-sm text-gray-600">
-          View and restore deleted candidates
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-black mb-2">Deleted Candidates</h2>
+            <p className="text-sm text-gray-600">
+              View and restore deleted candidates
+            </p>
+          </div>
+          <SyncIndicator lastSyncedAt={lastSyncedAt} isSyncing={isSyncing} />
+        </div>
       </div>
 
       {/* Error Display */}
