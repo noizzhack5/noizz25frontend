@@ -106,8 +106,16 @@ export function CandidatesTable({
   }
 
   // Sort candidates based on selected field and direction
+  // New candidates always appear at the top, then sorted by selected criteria
   // When hideHeader is true, parent handles sorting, so use candidates as-is
   const sortedCandidates = hideHeader ? candidates : [...candidates].sort((a, b) => {
+    // New candidates always come first
+    const aIsNew = a.isNew ? 1 : 0;
+    const bIsNew = b.isNew ? 1 : 0;
+    if (aIsNew !== bIsNew) {
+      return bIsNew - aIsNew; // New candidates first
+    }
+
     if (!sortField || !sortDirection) {
       // Default sort by match score descending (null values go to end)
       const scoreA = a.primaryGroup.matchScore ?? -1;
@@ -260,7 +268,7 @@ export function CandidatesTable({
       {/* Sticky Header */}
       {!hideHeader && stickyHeaderTop && (
         <div 
-          className="sticky z-10 border border-gray-200 border-b-0 rounded-t-lg bg-gray-50"
+          className="sticky z-20 border border-gray-200 border-b-0 rounded-t-lg bg-gray-50"
           style={{ 
             top: stickyHeaderTop,
             boxShadow: '0 -20px 0 20px white'
@@ -383,28 +391,30 @@ export function CandidatesTable({
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      {candidate.cvUrl && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (onViewResume) {
-                              onViewResume(candidate.cvUrl!, candidate.fullName);
-                            } else {
-                              window.open(candidate.cvUrl!, '_blank');
-                            }
-                          }}
-                          className="p-2 hover:bg-gray-200 transition-colors rounded group relative"
-                          title="View Resume"
-                        >
-                          <div className="relative">
-                            <FileText size={18} className="text-gray-600" strokeWidth={1.5} />
-                            <div className="absolute -bottom-0.5 -right-0.5 bg-white rounded-full p-0.5">
-                              <Eye size={8} className="text-gray-700" strokeWidth={2.5} />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        {candidate.extractedText && candidate.extractedText.trim() !== '' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onViewResume) {
+                                onViewResume(candidate.cvUrl || '', candidate.fullName);
+                              } else if (candidate.cvUrl) {
+                                window.open(candidate.cvUrl, '_blank');
+                              }
+                            }}
+                            className="p-2 hover:bg-gray-200 transition-colors rounded group relative"
+                            title="View Resume"
+                          >
+                            <div className="relative">
+                              <FileText size={18} className="text-gray-600" strokeWidth={1.5} />
+                              <div className="absolute -bottom-0.5 -right-0.5 bg-white rounded-full p-0.5">
+                                <Eye size={8} className="text-gray-700" strokeWidth={2.5} />
+                              </div>
                             </div>
-                          </div>
-                        </button>
-                      )}
+                          </button>
+                        )}
+                      </div>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

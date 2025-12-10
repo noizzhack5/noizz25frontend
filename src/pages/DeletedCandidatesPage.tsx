@@ -5,7 +5,6 @@ export function DeletedCandidatesPage() {
   const {
     candidates,
     searchQuery,
-    isLoading,
     error,
     fetchDeletedCandidates,
     setSearchQuery,
@@ -33,13 +32,6 @@ export function DeletedCandidatesPage() {
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-600">{error}</p>
-        </div>
-      )}
-
-      {/* Loading Indicator */}
-      {isLoading && (
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-blue-600">Loading deleted candidates...</p>
         </div>
       )}
 

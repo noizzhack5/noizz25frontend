@@ -55,6 +55,7 @@ export interface Candidate {
   notes: string;
   manualNotes?: string;
   cvUrl?: string;
+  extractedText?: string;
   profileImage?: string;
   createdAt: Date;
   warnings?: string[];

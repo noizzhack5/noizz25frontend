@@ -287,8 +287,7 @@ export function DashboardPage() {
           : "Candidate added successfully!", 
         type: "success" 
       });
-      // Refresh the list
-      fetchCandidates();
+      // Note: addCandidate already fetches and updates the candidates list with isNew flag
     } catch (error) {
       setToast({
         message: error instanceof Error ? error.message : "Failed to add candidate",
@@ -335,7 +334,7 @@ export function DashboardPage() {
       />
 
       {/* Filter Bar */}
-      <div className="sticky top-14 z-20 bg-white pt-4 -mt-4">
+      <div className="sticky top-14 z-30 bg-white pt-4 -mt-4">
         <FilterBar
           statusFilter={statusFilter}
           jobTypeFilter={jobTypeFilter}

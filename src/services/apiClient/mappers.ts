@@ -144,6 +144,7 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     notes: knownData.notes || "",
     manualNotes: undefined,
     cvUrl: doc.cv_url,
+    extractedText: doc.extracted_text || undefined,
     profileImage: doc.profile_image,
     createdAt,
     deleted: doc.is_deleted || false,
