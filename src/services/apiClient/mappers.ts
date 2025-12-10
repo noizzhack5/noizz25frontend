@@ -19,7 +19,8 @@ export function mapCVDocumentToCandidate(doc: CVDocument): Candidate {
     "Ready For Bot Interview": "ready_for_bot_interview", // API returns with capital F
     "Bot Interview": "bot_interview",
     "Waiting Classification": "submitted",
-    "In Classification": "ready_for_bot_interview",
+    "Ready For Classification": "bot_interview",
+    "In Classification": "bot_interview",
     "Ready For Recruit": "ready_for_recruit",
     "Ready for Recruit": "ready_for_recruit",
     // Numeric statuses (if still used)
