@@ -12,7 +12,7 @@ import type {
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "https://noizz25backend.onrender.com";
 
-const CHAT_HISTORY_BASE_URL = "https://noizzhrdashboard.onrender.com";
+const CHAT_HISTORY_BASE_URL = "https://noizz25backend.onrender.com";
 
 class ApiError extends Error {
   constructor(
