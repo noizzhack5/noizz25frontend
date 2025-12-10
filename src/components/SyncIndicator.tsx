@@ -8,11 +8,12 @@ interface SyncIndicatorProps {
 
 function formatTimeAgo(date: Date): string {
   const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  // Start counting from 1 second instead of 0
+  const displaySeconds = seconds + 1;
   
-  if (seconds < 5) return 'Just now';
-  if (seconds < 60) return `${seconds}s ago`;
+  if (displaySeconds < 60) return `${displaySeconds}s ago`;
   
-  const minutes = Math.floor(seconds / 60);
+  const minutes = Math.floor(displaySeconds / 60);
   if (minutes < 60) return `${minutes}m ago`;
   
   const hours = Math.floor(minutes / 60);
@@ -22,14 +23,19 @@ function formatTimeAgo(date: Date): string {
 export function SyncIndicator({ lastSyncedAt, isSyncing }: SyncIndicatorProps) {
   const [, setTick] = useState(0);
 
-  // Update the "time ago" display every 10 seconds
+  // Update the "time ago" display every second to show real-time count
+  // Only update when not syncing and we have a valid lastSyncedAt
   useEffect(() => {
+    if (isSyncing || !lastSyncedAt) {
+      return;
+    }
+    
     const interval = setInterval(() => {
       setTick(t => t + 1);
-    }, 10000);
+    }, 1000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [isSyncing, lastSyncedAt]);
 
   return (
     <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -38,12 +44,17 @@ export function SyncIndicator({ lastSyncedAt, isSyncing }: SyncIndicatorProps) {
           <RefreshCw size={12} className="animate-spin" />
           <span>Syncing...</span>
         </>
-      ) : (
+      ) : lastSyncedAt ? (
         <>
           <Wifi size={12} className="text-green-500" />
           <span>
-            Live{lastSyncedAt && ` · ${formatTimeAgo(lastSyncedAt)}`}
+            Live · {formatTimeAgo(lastSyncedAt)}
           </span>
+        </>
+      ) : (
+        <>
+          <Wifi size={12} className="text-gray-400" />
+          <span>Live</span>
         </>
       )}
     </div>
