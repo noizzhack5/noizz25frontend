@@ -9,6 +9,10 @@ interface ChatbotPreviewModalProps {
   onClose: () => void;
 }
 
+// Generate a consistent random avatar URL based on candidate ID
+const getRandomAvatarUrl = (candidateId: string, size: number = 200) => {
+  return `https://i.pravatar.cc/${size}?u=${candidateId}`;
+};
 
 export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -65,6 +69,13 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
         {/* Header - WhatsApp style */}
         <div className="bg-[#075E54] text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+              <img 
+                src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 80)} 
+                alt={candidate.fullName} 
+                className="w-full h-full object-cover" 
+              />
+            </div>
             <div>
               <p className="font-medium">{candidate.fullName}</p>
               <p className="text-xs text-white/80">WhatsApp Conversation</p>
@@ -72,7 +83,7 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-white/10 rounded transition-colors cursor-pointer"
+            className="p-1 hover:bg-white/10 rounded transition-colors"
           >
             <X size={20} />
           </button>
@@ -156,7 +167,7 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setFeedback('good')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all ${
                   feedback === 'good' 
                     ? 'bg-green-500 text-white' 
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-green-50 hover:border-green-300'
@@ -167,7 +178,7 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
               </button>
               <button
                 onClick={() => setFeedback('bad')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all ${
                   feedback === 'bad' 
                     ? 'bg-red-500 text-white' 
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-red-50 hover:border-red-300'

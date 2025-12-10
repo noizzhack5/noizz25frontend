@@ -19,6 +19,10 @@ const getJobTypeLabel = (jobType: string) => {
   return labels[jobType] || jobType;
 };
 
+// Generate a consistent random avatar URL based on candidate ID
+const getRandomAvatarUrl = (candidateId: string, size: number = 200) => {
+  return `https://i.pravatar.cc/${size}?u=${candidateId}`;
+};
 
 export function CandidateAddedModal({ candidate, onClose, onViewDetails }: CandidateAddedModalProps) {
   const matchScore = candidate.primaryGroup.matchScore ?? 0;
@@ -170,23 +174,13 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
               className="p-5 rounded-xl bg-gray-50 border border-gray-100"
             >
               <div className="flex items-center gap-3 mb-3">
-                {(() => {
-                  const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
-                  return (
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-base flex-shrink-0 ring-2 ring-gray-200"
-                      style={{ 
-                        backgroundColor: avatarColor.bg, 
-                        color: avatarColor.text,
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-                        opacity: 0.5,
-                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
-                      }}
-                    >
-                      {getInitials(candidate.fullName)}
-                    </div>
-                  );
-                })()}
+                <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-200">
+                  <img 
+                    src={candidate.profileImage || getRandomAvatarUrl(candidate.id, 100)} 
+                    alt={candidate.fullName} 
+                    className="w-full h-full object-cover" 
+                  />
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-black truncate">{candidate.fullName}</p>
                   {candidate.fullNameHebrew && (
@@ -247,7 +241,7 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
               onClick={onViewDetails}
-              className="flex-1 bg-black text-white px-6 py-3.5 rounded-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 group shadow-lg shadow-black/10 cursor-pointer"
+              className="flex-1 bg-black text-white px-6 py-3.5 rounded-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 group shadow-lg shadow-black/10"
             >
               <span>View Full Profile</span>
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -258,7 +252,7 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
               onClick={onClose}
-              className="px-6 py-3.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-gray-700 cursor-pointer"
+              className="px-6 py-3.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-gray-700"
             >
               Dismiss
             </motion.button>
