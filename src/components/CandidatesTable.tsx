@@ -274,7 +274,7 @@ export function CandidatesTable({
           {/* White cover above header to hide scrolling rows in the gap */}
           <div 
             className="absolute left-0 right-0 bg-white"
-            style={{ top: '-20px', height: '20px' }}
+            style={{ top: '-24px', height: '24px' }}
           />
           <div className="relative border border-gray-200 border-b-0 rounded-t-lg bg-gray-50">
             <table className="w-full table-fixed border-collapse">

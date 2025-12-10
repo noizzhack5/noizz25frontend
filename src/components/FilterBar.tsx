@@ -1,6 +1,7 @@
 import { X, Search, ChevronDown } from 'lucide-react';
 import type { Status, JobType } from '@/types';
 import { useState, useRef, useEffect } from 'react';
+import { SyncIndicator } from '@/components/SyncIndicator';
 
 interface FilterBarProps {
   statusFilter: Status | 'all';
@@ -17,6 +18,8 @@ interface FilterBarProps {
   availableCountries: string[];
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  lastSyncedAt: Date | null;
+  isSyncing: boolean;
 }
 
 export function FilterBar({
@@ -33,7 +36,9 @@ export function FilterBar({
   availableCampaigns,
   availableCountries,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  lastSyncedAt,
+  isSyncing
 }: FilterBarProps) {
   const [isStatusOpen, setIsStatusOpen] = useState(false);
   const [isJobTypeOpen, setIsJobTypeOpen] = useState(false);
@@ -164,10 +169,11 @@ export function FilterBar({
   ];
 
   return (
-    <div className="mb-6 space-y-3">
-      <div className="flex flex-wrap gap-2 md:gap-4">
-        {/* Search Bar */}
-        <div className="relative w-full md:w-auto md:min-w-[280px]">
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-2 md:gap-4 items-center justify-between">
+        <div className="flex flex-wrap gap-2 md:gap-4 flex-1">
+          {/* Search Bar */}
+          <div className="relative w-full md:w-auto md:min-w-[280px]">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
           <input
             type="text"
@@ -381,15 +387,21 @@ export function FilterBar({
           )}
         </div>
 
-        {/* Clear Filters Button */}
-        {activeFiltersCount > 0 && (
-          <button
-            onClick={clearAllFilters}
-            className="px-4 py-2 text-sm transition-colors rounded-full bg-white text-gray-700 hover:text-black w-full md:w-auto"
-          >
-            Clear filters
-          </button>
-        )}
+          {/* Clear Filters Button */}
+          {activeFiltersCount > 0 && (
+            <button
+              onClick={clearAllFilters}
+              className="px-4 py-2 text-sm transition-colors rounded-full bg-white text-gray-700 hover:text-black w-full md:w-auto"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+        
+        {/* Sync Indicator */}
+        <div className="flex-shrink-0">
+          <SyncIndicator lastSyncedAt={lastSyncedAt} isSyncing={isSyncing} />
+        </div>
       </div>
     </div>
   );

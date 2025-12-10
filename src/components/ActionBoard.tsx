@@ -127,8 +127,8 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
   return (
     <div>
       {isVisible && (
-        <div className="bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 py-6 mb-6">
-          <div className="flex flex-nowrap items-start gap-8 md:gap-12 lg:gap-16 xl:gap-20 overflow-x-auto scrollbar-hide">
+        <div className="bg-white border-b border-gray-200 px-4 md:px-6 lg:px-8 py-6 mb-6 mx-auto">
+          <div className="flex flex-nowrap items-start justify-between overflow-x-auto scrollbar-hide action-board-width">
             {/* 1. Total Candidates */}
             <div className="flex-shrink-0 flex flex-col items-start min-w-[280px]">
               <p className="text-xs text-gray-400 mb-2">Total Candidates</p>
@@ -265,7 +265,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
 
             {/* 2. Top 3 Countries */}
             {topCountries.length > 0 && (
-              <div className="flex-shrink-0 flex flex-col items-start min-w-[220px]">
+              <div className="flex-shrink-0 flex flex-col items-start" style={{ width: '220px' }}>
                 <p className="text-xs text-gray-400 mb-2">Top 3 Countries (Ready)</p>
                 <div className="flex items-start gap-3 w-full">
                   <div className="flex flex-col gap-1.5 w-full">
