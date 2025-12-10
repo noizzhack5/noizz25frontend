@@ -357,7 +357,7 @@ export function DashboardPage() {
       />
 
       {/* Filter Bar */}
-      <div className="sticky top-14 z-30 bg-white pt-4 -mt-4">
+      <div className="sticky top-14 z-30 bg-white pt-4 -mt-4 pb-4">
         {/* Sync status indicator - subtle, top-right */}
         <div className="flex justify-end mb-1">
           <SyncIndicator lastSyncedAt={lastSyncedAt} isSyncing={isSyncing} />
@@ -383,7 +383,7 @@ export function DashboardPage() {
       {/* Candidates Table */}
       <CandidatesTable
         candidates={filteredCandidates}
-        stickyHeaderTop="124px"
+        stickyHeaderTop="148px"
         onSelectCandidate={setSelectedCandidate}
         onDeleteCandidate={async (id) => {
           try {
