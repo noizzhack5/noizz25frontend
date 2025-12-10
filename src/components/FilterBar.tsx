@@ -191,14 +191,14 @@ export function FilterBar({
         <div ref={statusRef} className="relative flex-1 md:flex-initial min-w-[180px]">
           <button
             onClick={() => setIsStatusOpen(!isStatusOpen)}
-            className={`w-full px-4 py-2 border text-sm cursor-pointer transition-colors rounded-full text-left flex items-center justify-between ${
+            className={`w-full px-4 py-2 border text-sm cursor-pointer transition-colors rounded-full text-left flex items-center justify-between whitespace-nowrap ${
               statusFilter !== 'all'
                 ? 'bg-white text-black border-[#F3CB06]'
                 : 'bg-white text-gray-700 border-gray-300 hover:border-black'
             }`}
           >
-            <span>{getStatusLabel()}</span>
-            <ChevronDown size={12} className={`transition-transform ${isStatusOpen ? 'rotate-180' : ''}`} />
+            <span className="truncate">{getStatusLabel()}</span>
+            <ChevronDown size={12} className={`transition-transform flex-shrink-0 ${isStatusOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isStatusOpen && (
@@ -211,7 +211,7 @@ export function FilterBar({
                       onStatusFilterChange(option.value);
                       setIsStatusOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-2 hover:bg-gray-50 cursor-pointer rounded transition-colors ${
+                    className={`w-full text-left px-3 py-2 hover:bg-gray-50 cursor-pointer rounded transition-colors whitespace-nowrap ${
                       statusFilter === option.value ? 'bg-gray-100 text-black' : 'text-gray-700'
                     }`}
                   >

@@ -247,7 +247,7 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
               onClick={onViewDetails}
-              className="flex-1 bg-black text-white px-6 py-3.5 rounded-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 group shadow-lg shadow-black/10"
+              className="flex-1 bg-black text-white px-6 py-3.5 rounded-xl hover:bg-gray-800 transition-all flex items-center justify-center gap-2 group shadow-lg shadow-black/10 cursor-pointer"
             >
               <span>View Full Profile</span>
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -258,7 +258,7 @@ export function CandidateAddedModal({ candidate, onClose, onViewDetails }: Candi
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
               onClick={onClose}
-              className="px-6 py-3.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-gray-700"
+              className="px-6 py-3.5 rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-gray-700 cursor-pointer"
             >
               Dismiss
             </motion.button>
