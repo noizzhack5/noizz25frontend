@@ -30,7 +30,7 @@ export function Header({ onAddCandidate, onImportExcel, showActionBoard, onToggl
         {onSimulateChatbot && onToggleActionBoard && (
           <button
             onClick={onSimulateChatbot}
-            className="w-8 h-8 hover:bg-gray-50 transition-colors rounded opacity-0 hover:opacity-100"
+            className="w-8 h-8 hover:bg-gray-50 transition-colors rounded opacity-0 hover:opacity-100 cursor-pointer"
             title="Trigger notification"
           >
           </button>
@@ -38,7 +38,7 @@ export function Header({ onAddCandidate, onImportExcel, showActionBoard, onToggl
         {onToggleActionBoard && (
           <button
             onClick={onToggleActionBoard}
-            className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 hover:bg-gray-100 transition-colors rounded"
+            className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 hover:bg-gray-100 transition-colors rounded cursor-pointer"
             title="Toggle Dashboard"
           >
             <BarChart3 size={18} className="text-gray-700" />
@@ -48,7 +48,7 @@ export function Header({ onAddCandidate, onImportExcel, showActionBoard, onToggl
         {onAddCandidate && (
           <button
             onClick={onAddCandidate}
-            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 bg-white text-black border border-[#F3CB06] hover:bg-[#FFFACD] transition-colors rounded text-sm"
+            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 bg-white text-black border border-[#F3CB06] hover:bg-[#FFFACD] transition-colors rounded text-sm cursor-pointer"
             title="Add Candidate"
           >
             <UserPlus size={16} />
@@ -58,7 +58,7 @@ export function Header({ onAddCandidate, onImportExcel, showActionBoard, onToggl
         {onImportExcel && (
           <button
             onClick={onImportExcel}
-            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 bg-[#F3CB06] text-black hover:bg-[#d4b005] transition-colors rounded text-sm"
+            className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 bg-[#F3CB06] text-black hover:bg-[#d4b005] transition-colors rounded text-sm cursor-pointer"
             title="Import Excel"
           >
             <FileSpreadsheet size={16} />
