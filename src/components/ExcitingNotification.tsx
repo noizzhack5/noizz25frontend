@@ -20,6 +20,7 @@ interface Confetti {
   delay: number;
 }
 
+
 export function ExcitingNotification({ candidate, onClose, onViewDetails }: ExcitingNotificationProps) {
   const [confetti, setConfetti] = useState<Confetti[]>([]);
 
@@ -147,22 +148,26 @@ export function ExcitingNotification({ candidate, onClose, onViewDetails }: Exci
           <div className="p-7">
             {/* Candidate Info */}
             <div className="flex items-center gap-4 mb-6">
-              {candidate.profileImage ? (
-                <div className="w-18 h-18 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-yellow-400/30">
-                  <img 
-                    src={candidate.profileImage} 
-                    alt={candidate.fullName} 
-                    className="w-full h-full object-cover" 
-                  />
-                </div>
-              ) : (
-                <div className="w-18 h-18 rounded-full flex-shrink-0 ring-2 ring-yellow-400/30 bg-gray-100 flex items-center justify-center">
-                  <User size={30} className="text-gray-400" />
-                </div>
-              )}
+              {(() => {
+                const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
+                return (
+                  <div 
+                    className="w-18 h-18 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 ring-2 ring-yellow-400/30"
+                    style={{ 
+                      backgroundColor: avatarColor.bg, 
+                      color: avatarColor.text,
+                      textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                      opacity: 0.5,
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                    }}
+                  >
+                    {getInitials(candidate.fullName)}
+                  </div>
+                );
+              })()}
               <div className="flex-1 min-w-0">
-                <p className="text-black truncate text-xl">Mike Muadi</p>
-                <p className="text-base text-gray-500 truncate">maudi_m@gmail.com</p>
+                <p className="text-black truncate text-xl">{candidate.fullName}</p>
+                <p className="text-base text-gray-500 truncate">{candidate.email}</p>
               </div>
             </div>
 
