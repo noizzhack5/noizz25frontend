@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#000000"/>
+  <g transform="translate(50, 50)">
+    <!-- Vertical stem - thicker and curved -->
+    <rect x="-10" y="-30" width="20" height="55" rx="6" fill="#F3CB06"/>
+    <!-- Horizontal bar - elongated with rounded ends -->
+    <rect x="-30" y="-30" width="60" height="20" rx="6" fill="#F3CB06"/>
+  </g>
+</svg>
+

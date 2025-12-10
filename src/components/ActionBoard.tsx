@@ -191,7 +191,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                     </PieChart>
                   </ResponsiveContainer>
                 </button>
-                <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                <div className="grid grid-cols-2 gap-x-1 gap-y-2">
                   <button 
                     onClick={() => {
                       if (statusFilter === 'submitted') {
@@ -200,7 +200,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                         onStatusFilterClick?.('submitted');
                       }
                     }}
-                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer whitespace-nowrap ${
                       statusFilter === 'submitted' ? 'font-medium' : (statusFilter !== 'all' ? 'opacity-40' : '')
                     }`}
                     title="Filter by Submitted"
@@ -217,7 +217,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                         onStatusFilterClick?.('ready_for_bot_interview');
                       }
                     }}
-                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer whitespace-nowrap ${
                       statusFilter === 'ready_for_bot_interview' ? 'font-medium' : (statusFilter !== 'all' ? 'opacity-40' : '')
                     }`}
                     title="Filter by Waiting for Bot Interview"
@@ -234,7 +234,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                         onStatusFilterClick?.('bot_interview');
                       }
                     }}
-                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer whitespace-nowrap ${
                       statusFilter === 'bot_interview' ? 'font-medium' : (statusFilter !== 'all' ? 'opacity-40' : '')
                     }`}
                     title="Filter by Bot Interview"
@@ -251,7 +251,7 @@ export function ActionBoard({ isVisible, onToggle, candidates, onStatusFilterCli
                         onStatusFilterClick?.('ready_for_recruit');
                       }
                     }}
-                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 hover:opacity-70 transition-all cursor-pointer whitespace-nowrap ${
                       statusFilter === 'ready_for_recruit' ? 'font-medium' : (statusFilter !== 'all' ? 'opacity-40' : '')
                     }`}
                     title="Filter by Ready for Recruit"
