@@ -106,8 +106,16 @@ export function CandidatesTable({
   }
 
   // Sort candidates based on selected field and direction
+  // New candidates always appear at the top, then sorted by selected criteria
   // When hideHeader is true, parent handles sorting, so use candidates as-is
   const sortedCandidates = hideHeader ? candidates : [...candidates].sort((a, b) => {
+    // New candidates always come first
+    const aIsNew = a.isNew ? 1 : 0;
+    const bIsNew = b.isNew ? 1 : 0;
+    if (aIsNew !== bIsNew) {
+      return bIsNew - aIsNew; // New candidates first
+    }
+
     if (!sortField || !sortDirection) {
       // Default sort by match score descending (null values go to end)
       const scoreA = a.primaryGroup.matchScore ?? -1;

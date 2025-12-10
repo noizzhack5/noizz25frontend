@@ -287,8 +287,7 @@ export function DashboardPage() {
           : "Candidate added successfully!", 
         type: "success" 
       });
-      // Refresh the list
-      fetchCandidates();
+      // Note: addCandidate already fetches and updates the candidates list with isNew flag
     } catch (error) {
       setToast({
         message: error instanceof Error ? error.message : "Failed to add candidate",

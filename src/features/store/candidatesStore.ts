@@ -66,7 +66,19 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const docs = await apiClient.getAllCVs(false);
-      const candidates = docs.map(mapCVDocumentToCandidate);
+      const newCandidates = docs.map(mapCVDocumentToCandidate);
+      
+      // Preserve isNew flags from existing candidates
+      const existingCandidates = get().candidates;
+      const existingNewFlags = new Map(
+        existingCandidates.filter(c => c.isNew).map(c => [c.id, true])
+      );
+      
+      const candidates = newCandidates.map(c => ({
+        ...c,
+        isNew: existingNewFlags.get(c.id) || false,
+      }));
+      
       const currentSelectedId = get().selectedCandidate?.id;
       const updatedSelectedCandidate = currentSelectedId 
         ? candidates.find(c => c.id === currentSelectedId) || null
@@ -125,7 +137,19 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
       };
 
       const docs = await apiClient.searchCVs(searchParams);
-      const candidates = docs.map(mapCVDocumentToCandidate);
+      const newCandidates = docs.map(mapCVDocumentToCandidate);
+      
+      // Preserve isNew flags from existing candidates
+      const existingCandidates = state.candidates;
+      const existingNewFlags = new Map(
+        existingCandidates.filter(c => c.isNew).map(c => [c.id, true])
+      );
+      
+      const candidates = newCandidates.map(c => ({
+        ...c,
+        isNew: existingNewFlags.get(c.id) || false,
+      }));
+      
       const currentSelectedId = state.selectedCandidate?.id;
       const updatedSelectedCandidate = currentSelectedId 
         ? candidates.find(c => c.id === currentSelectedId) || null
@@ -161,11 +185,28 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
       };
 
       const response = await apiClient.uploadCV(uploadData);
+      const newCandidateId = response.id;
       
       // Refresh the candidates list to include the new one
-      await get().fetchCandidates();
+      const docs = await apiClient.getAllCVs(false);
+      const candidates = docs.map(mapCVDocumentToCandidate);
       
-      set({ isLoading: false });
+      // Mark the newly added candidate as new so it appears at the top with "New" tag
+      const candidatesWithNewFlag = candidates.map((c) =>
+        c.id === newCandidateId ? { ...c, isNew: true } : c
+      );
+      
+      const currentSelectedId = get().selectedCandidate?.id;
+      const updatedSelectedCandidate = currentSelectedId 
+        ? candidatesWithNewFlag.find(c => c.id === currentSelectedId) || null
+        : null;
+      
+      set({ 
+        candidates: candidatesWithNewFlag, 
+        selectedCandidate: updatedSelectedCandidate,
+        isLoading: false 
+      });
+      
       return response;
     } catch (error) {
       const message =
@@ -289,10 +330,13 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
   },
 
   setSelectedCandidate: (candidate) => {
-    if (candidate) {
+    const previouslySelected = get().selectedCandidate;
+    
+    // Clear isNew flag of previously selected candidate when switching or closing
+    if (previouslySelected && previouslySelected.id !== candidate?.id) {
       set((state) => ({
         candidates: state.candidates.map((c) =>
-          c.id === candidate.id
+          c.id === previouslySelected.id
             ? {
                 ...c,
                 isNew: false,
@@ -304,7 +348,7 @@ export const useCandidatesStore = create<CandidatesState>((set, get) => ({
         selectedCandidate: candidate,
       }));
     } else {
-      set({ selectedCandidate: null });
+      set({ selectedCandidate: candidate });
     }
   },
   
