@@ -110,7 +110,7 @@ const getStatusColor = (status: string) => {
 
 const YesNoField = ({ value }: { value?: boolean | null | string }) => {
   if (value === undefined || value === null || value === '') {
-    return <span className="text-red-500">Missing</span>;
+    return <span className="text-black">---</span>;
   }
   return (
     <span className={value ? 'text-green-600' : 'text-red-600'}>
@@ -125,7 +125,7 @@ const DataField = ({ label, value, missing }: { label: string; value?: string | 
     <div>
       <p className="text-sm text-gray-500 mb-1">{label}</p>
       {isMissing ? (
-        <span className="text-red-500 text-sm">Missing</span>
+        <span className="text-black text-sm">---</span>
       ) : (
         <span className="text-gray-900">{value}</span>
       )}
@@ -379,7 +379,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                     {candidate.age ? (
                       <p className="text-sm text-black">{candidate.age} years</p>
                     ) : (
-                      <p className="text-sm text-red-500">Missing</p>
+                      <p className="text-sm text-black">---</p>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -387,7 +387,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                     {candidate.citizenship ? (
                       <p className="text-sm text-black">{candidate.citizenship}</p>
                     ) : (
-                      <p className="text-sm text-red-500">Missing</p>
+                      <p className="text-sm text-black">---</p>
                     )}
                   </div>
                 </div>
@@ -410,7 +410,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                         {candidate.phone}
                       </a>
                     ) : (
-                      <span className="text-sm text-red-500">Missing</span>
+                      <span className="text-sm text-black">---</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -423,7 +423,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                         {candidate.email}
                       </a>
                     ) : (
-                      <span className="text-sm text-red-500">Missing</span>
+                      <span className="text-sm text-black">---</span>
                     )}
                   </div>
                 </div>
@@ -850,7 +850,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                       {candidate.age ? (
                         <p className="text-gray-900">{candidate.age}</p>
                       ) : (
-                        <p className="text-red-500">Missing</p>
+                        <p className="text-black">---</p>
                       )}
                     </div>
                     <div>
@@ -858,7 +858,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                       {candidate.citizenship ? (
                         <p className="text-gray-900">{candidate.citizenship}</p>
                       ) : (
-                        <p className="text-red-500">Missing</p>
+                        <p className="text-black">---</p>
                       )}
                     </div>
                   </div>
