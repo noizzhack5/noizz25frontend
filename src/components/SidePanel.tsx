@@ -138,7 +138,7 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 transition-colors"
+            className="p-2 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -252,7 +252,7 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
               <div className="mt-4">
                 <button
                   onClick={() => setShowAlternativeGroups(!showAlternativeGroups)}
-                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-black"
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-black cursor-pointer"
                 >
                   {showAlternativeGroups ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   Show Alternative Group Matches
@@ -314,7 +314,7 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={handleSaveNotes}
-                    className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm"
+                    className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm cursor-pointer"
                   >
                     Save
                   </button>
@@ -323,7 +323,7 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
                       setNotes(candidate.notes);
                       setIsEditingNotes(false);
                     }}
-                    className="px-4 py-2 border border-gray-300 hover:border-black text-sm"
+                    className="px-4 py-2 border border-gray-300 hover:border-black text-sm cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -342,7 +342,7 @@ export function SidePanel({ candidate, onClose, onUpdate }: SidePanelProps) {
                 )}
                 <button
                   onClick={() => setIsEditingNotes(true)}
-                  className="text-sm text-gray-600 hover:text-black"
+                  className="text-sm text-gray-600 hover:text-black cursor-pointer"
                 >
                   {candidate.notes ? 'Edit Notes' : 'Add Notes'}
                 </button>

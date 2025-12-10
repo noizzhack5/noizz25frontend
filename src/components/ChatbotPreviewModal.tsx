@@ -65,23 +65,6 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
         {/* Header - WhatsApp style */}
         <div className="bg-[#075E54] text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {(() => {
-              const avatarColor = getAvatarColor(candidate.id, candidate.fullName);
-              return (
-                <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm"
-                  style={{ 
-                    backgroundColor: avatarColor.bg, 
-                    color: avatarColor.text,
-                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
-                    opacity: 0.5,
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
-                  }}
-                >
-                  {getInitials(candidate.fullName)}
-                </div>
-              );
-            })()}
             <div>
               <p className="font-medium">{candidate.fullName}</p>
               <p className="text-xs text-white/80">WhatsApp Conversation</p>
@@ -89,7 +72,7 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-white/10 rounded transition-colors"
+            className="p-1 hover:bg-white/10 rounded transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -173,7 +156,7 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setFeedback('good')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all cursor-pointer ${
                   feedback === 'good' 
                     ? 'bg-green-500 text-white' 
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-green-50 hover:border-green-300'
@@ -184,7 +167,7 @@ export function ChatbotPreviewModal({ candidate, onClose }: ChatbotPreviewModalP
               </button>
               <button
                 onClick={() => setFeedback('bad')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded transition-all cursor-pointer ${
                   feedback === 'bad' 
                     ? 'bg-red-500 text-white' 
                     : 'bg-white text-gray-700 border border-gray-200 hover:bg-red-50 hover:border-red-300'

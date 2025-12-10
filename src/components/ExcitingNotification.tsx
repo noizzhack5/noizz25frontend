@@ -137,7 +137,7 @@ export function ExcitingNotification({ candidate, onClose, onViewDetails }: Exci
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+                className="p-1.5 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
               >
                 <X size={24} className="text-white" />
               </button>

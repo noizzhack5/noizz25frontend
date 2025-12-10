@@ -166,7 +166,7 @@ const CollapsibleSection = ({
     <div className="overflow-hidden">
       <button
         onClick={handleToggle}
-        className="w-full py-3 hover:bg-gray-50 transition-colors flex items-center justify-between"
+        className="w-full py-3 hover:bg-gray-50 transition-colors flex items-center justify-between cursor-pointer"
       >
         <div className="flex items-center gap-2">
           {Icon && <Icon size={16} className="text-gray-400" />}
@@ -290,7 +290,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
           <div className="flex items-center gap-2">
             <button
               onClick={handleAddNote}
-              className="p-2 hover:bg-gray-100 transition-colors rounded"
+              className="p-2 hover:bg-gray-100 transition-colors rounded cursor-pointer"
               title="Add recruiter note"
             >
               <Edit3 size={20} className="text-gray-700" />
@@ -298,7 +298,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
             {candidate.cvUrl && (
               <button
                 onClick={handleOpenCV}
-                className="p-2 hover:bg-gray-100 transition-colors rounded"
+                className="p-2 hover:bg-gray-100 transition-colors rounded cursor-pointer"
                 title="Open CV/Resume"
               >
                 <FileText size={20} className="text-gray-700" />
@@ -307,7 +307,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
             {candidate.status === 'ready_for_bot_interview' && (
               <button
                 onClick={() => setShowBotConfirmation(true)}
-                className="p-2 hover:bg-[#F3CB06] transition-colors rounded bg-[#F3CB06]"
+                className="p-2 hover:bg-[#F3CB06] transition-colors rounded bg-[#F3CB06] cursor-pointer"
                 title="Start Bot Interview"
               >
                 <Bot size={20} className="text-black" strokeWidth={2} />
@@ -316,7 +316,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
             {candidate.status !== 'submitted' && candidate.status !== 'ready_for_bot_interview' && (
               <button
                 onClick={() => setShowChatbotModal(true)}
-                className="p-2 hover:bg-gray-100 transition-colors rounded"
+                className="p-2 hover:bg-gray-100 transition-colors rounded cursor-pointer"
                 title="View Chatbot Conversation"
               >
                 <MessageSquare size={20} className="text-[#075E54]" />
@@ -324,7 +324,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
             )}
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 transition-colors rounded"
+              className="p-2 hover:bg-gray-100 transition-colors rounded cursor-pointer"
             >
               <X size={20} className="text-gray-700" />
             </button>
@@ -694,7 +694,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
           <div className="absolute top-6 right-6">
             <button
               onClick={() => setShowBotConfirmation(true)}
-              className="bg-[#F3CB06] text-black py-2 px-5 rounded-lg hover:bg-[#d4b305] transition-colors flex items-center gap-2"
+              className="bg-[#F3CB06] text-black py-2 px-5 rounded-lg hover:bg-[#d4b305] transition-colors flex items-center gap-2 cursor-pointer"
             >
               <MessageSquare size={18} />
               <span>Start bot conversation</span>
@@ -782,7 +782,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
                   }
                 }}
                 disabled={isStartingBot}
-                className="px-5 py-2 bg-[#F3CB06] text-black rounded-lg hover:bg-[#d4b305] transition-colors text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-5 py-2 bg-[#F3CB06] text-black rounded-lg hover:bg-[#d4b305] transition-colors text-sm flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isStartingBot ? 'Starting...' : "Yes I'm sure"}
               </button>
@@ -814,7 +814,7 @@ export function CandidateCard({ candidate, onClose, onStatusChange, onRefresh }:
               </div>
               <button
                 onClick={() => setShowCVModal(false)}
-                className="p-2 hover:bg-gray-100 transition-colors rounded"
+                className="p-2 hover:bg-gray-100 transition-colors rounded cursor-pointer"
               >
                 <X size={20} className="text-gray-700" />
               </button>
