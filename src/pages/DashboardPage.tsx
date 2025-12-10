@@ -9,7 +9,6 @@ import { AddCandidateModal } from "@/components/AddCandidateModal";
 import { ExcitingNotification } from "@/components/ExcitingNotification";
 import { ResumeViewer } from "@/components/ResumeViewer";
 import { Toast } from "@/components/Toast";
-import { SyncIndicator } from "@/components/SyncIndicator";
 import { useUIStore } from "@/features/store/uiStore";
 import { usePolling } from "@/hooks/usePolling";
 import type { Candidate, Status, JobType } from "@/types";
@@ -357,11 +356,7 @@ export function DashboardPage() {
       />
 
       {/* Filter Bar */}
-      <div className="sticky top-14 z-30 bg-white pt-4 -mt-4 pb-4">
-        {/* Sync status indicator - subtle, top-right */}
-        <div className="flex justify-end mb-1">
-          <SyncIndicator lastSyncedAt={lastSyncedAt} isSyncing={isSyncing} />
-        </div>
+      <div className="sticky top-14 z-30 bg-white py-4 mb-4 pb-6">
         <FilterBar
           statusFilter={statusFilter}
           jobTypeFilter={jobTypeFilter}
@@ -377,6 +372,8 @@ export function DashboardPage() {
           countriesFilter={countriesFilter}
           onCountriesFilterChange={setCountriesFilter}
           availableCountries={availableCountries}
+          lastSyncedAt={lastSyncedAt}
+          isSyncing={isSyncing}
         />
       </div>
 
